@@ -51,6 +51,9 @@ group :development, :test do
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem 'brakeman', require: false
+
+  # Use RSpec for testing [
+  gem 'rspec-rails'
 end
 
 group :development do
