@@ -1,0 +1,226 @@
+<div class="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 space-y-4 sm:space-y-0">
+      <div class="flex items-center space-x-4">
+        <div class="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+          <span class="text-3xl">🫘</span>
+        </div>
+        <div>
+          <h2 class="text-4xl font-black bg-gradient-to-r from-amber-700 to-orange-700 bg-clip-text text-transparent mb-2">Coffee Bean Inventory</h2>
+          <p class="text-gray-600 font-medium">Manage your premium coffee beans ✨</p>
+        </div>
+      </div>
+      <% if @materials.present? %>
+        <%= link_to new_material_path, 
+            class: 'group bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 flex items-center space-x-3' do %>
+          <div class="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform duration-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </div>
+          <span>Add New Beans</span>
+        <% end %>
+      <% end %>
+    </div>
+
+    <% if @materials.any? %>
+      <!-- Coffee Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="group bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-rotate-1 hover:scale-105">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <span class="text-3xl">🫘</span>
+            </div>
+            <div class="text-right">
+              <p class="text-orange-100 font-medium mb-1">Total Bean Types</p>
+              <p class="text-4xl font-black"><%= @materials.count %></p>
+            </div>
+          </div>
+          <div class="w-full bg-white/20 rounded-full h-2">
+            <div class="bg-white rounded-full h-2 w-3/4 shadow-sm"></div>
+          </div>
+        </div>
+
+        <div class="group bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:rotate-1 hover:scale-105">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <span class="text-3xl">💰</span>
+            </div>
+            <div class="text-right">
+              <p class="text-green-100 font-medium mb-1">Total Investment</p>
+              <p class="text-4xl font-black">₱<%= number_with_delimiter(@materials.sum(:cost), delimiter: ',') %></p>
+            </div>
+          </div>
+          <div class="w-full bg-white/20 rounded-full h-2">
+            <div class="bg-white rounded-full h-2 w-2/3 shadow-sm"></div>
+          </div>
+        </div>
+
+        <div class="group bg-gradient-to-br from-yellow-500 to-amber-600 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-rotate-1 hover:scale-105">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <span class="text-3xl">⚖️</span>
+            </div>
+            <div class="text-right">
+              <p class="text-yellow-100 font-medium mb-1">Unit Types</p>
+              <p class="text-4xl font-black"><%= @materials.distinct.count(:unit) %></p>
+            </div>
+          </div>
+          <div class="w-full bg-white/20 rounded-full h-2">
+            <div class="bg-white rounded-full h-2 w-4/5 shadow-sm"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coffee Bean Materials Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <% @materials.each_with_index do |material, index| %>
+          <div class="group bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl border border-white/20 overflow-hidden transition-all duration-500 transform hover:-translate-y-2 hover:rotate-1">
+            
+            <!-- Coffee Bean Card Header -->
+            <div class="relative bg-gradient-to-br <%= cycle('from-amber-100 via-orange-200 to-yellow-200', 'from-orange-100 via-red-200 to-pink-200', 'from-yellow-100 via-amber-200 to-orange-200', 'from-red-100 via-orange-200 to-amber-200', 'from-brown-100 via-amber-200 to-yellow-200') %> h-48 overflow-hidden">
+              
+              <!-- Coffee Bean Decorations -->
+              <div class="absolute top-4 left-4 w-3 h-4 bg-amber-800 rounded-full transform rotate-12 animate-bounce"></div>
+              <div class="absolute top-8 right-8 w-2 h-3 bg-amber-700 rounded-full animate-pulse"></div>
+              <div class="absolute bottom-6 left-8 w-2 h-3 bg-amber-900 rounded-full animate-bounce delay-300"></div>
+              
+              <!-- Material ID Badge -->
+              <div class="absolute top-6 right-6 z-10">
+                <div class="bg-white/90 backdrop-blur-sm <%= cycle('text-amber-600', 'text-orange-600', 'text-yellow-600', 'text-red-600', 'text-brown-600') %> text-xs font-black px-4 py-2 rounded-full shadow-lg">
+                  #<%= material.id.to_s.rjust(3, '0') %>
+                </div>
+              </div>
+              
+              <!-- Main Bean Icon -->
+              <div class="flex items-center justify-center h-full">
+                <div class="w-20 h-20 <%= cycle('bg-gradient-to-br from-amber-500 to-orange-600', 'bg-gradient-to-br from-orange-500 to-red-600', 'bg-gradient-to-br from-yellow-500 to-amber-600', 'bg-gradient-to-br from-red-500 to-orange-600', 'bg-gradient-to-br from-amber-600 to-yellow-600') %> rounded-3xl flex items-center justify-center shadow-2xl transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-500">
+                  <span class="text-3xl">
+                    <%= cycle('🫘', '☕', '🌰', '🥜', '🤎') %>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coffee Bean Material Content -->
+            <div class="p-8">
+              <!-- Bean Name -->
+              <h3 class="text-2xl font-black text-gray-800 mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-amber-700 group-hover:to-orange-700 group-hover:bg-clip-text transition-all duration-300">
+                <%= material.name %>
+              </h3>
+              
+              <!-- Unit Type -->
+              <div class="mb-6 flex items-center space-x-2">
+                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                  <span class="w-2 h-2 bg-amber-500 rounded-full mr-2 animate-pulse"></span>
+                  <%= material.unit %>
+                </span>
+              </div>
+
+              <!-- Coffee Stats Grid -->
+              <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="text-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
+                  <p class="text-sm font-medium text-blue-600 mb-1">Quantity</p>
+                  <p class="text-2xl font-black text-blue-700"><%= number_with_delimiter(material.quantity) %></p>
+                </div>
+                <div class="text-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-100">
+                  <p class="text-sm font-medium text-green-600 mb-1">Total Cost</p>
+                  <p class="text-2xl font-black text-green-700">₱<%= number_with_delimiter(material.cost, delimiter: ',') %></p>
+                </div>
+              </div>
+
+              <!-- Unit Price Display -->
+              <div class="mb-6 p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-100">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-orange-700">Unit Price</span>
+                  <span class="text-lg font-black text-orange-800">
+                    <% if material.quantity > 0 %>
+                      ₱<%= number_with_delimiter((material.cost / material.quantity).round(2), delimiter: ',') %>
+                    <% else %>
+                      N/A
+                    <% end %>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="space-y-3">
+                <!-- View & Edit Row -->
+                <div class="flex space-x-3">
+                  <%= link_to material_path(material), 
+                      class: 'flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 font-bold py-3 px-4 rounded-xl transition-all duration-300 text-center group shadow-lg hover:shadow-xl' do %>
+                    <div class="flex items-center justify-center space-x-2">
+                      <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                      <span>View</span>
+                    </div>
+                  <% end %>
+                  
+                  <%= link_to edit_material_path(material), 
+                      class: 'flex-1 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 text-center group shadow-lg hover:shadow-xl' do %>
+                    <div class="flex items-center justify-center space-x-2">
+                      <svg class="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                      <span>Edit</span>
+                    </div>
+                  <% end %>
+                </div>
+
+                <!-- Delete Button -->
+                <%= button_to material_path(material), method: :delete,
+                    class: 'w-full bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 border-none group shadow-lg hover:shadow-xl',
+                    data: { confirm: '🫘 Are you sure you want to remove these coffee beans from inventory?' } do %>
+                  <div class="flex items-center justify-center space-x-2">
+                    <svg class="w-5 h-5 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    <span>Remove Beans</span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <!-- Coffee Empty State -->
+      <div class="text-center py-24">
+        <div class="max-w-lg mx-auto">
+          <!-- Floating Coffee Bean Animation -->
+          <div class="relative mb-12">
+            <div class="bg-gradient-to-br from-amber-200 via-orange-200 to-yellow-200 rounded-full p-16 inline-block shadow-2xl animate-pulse">
+              <div class="bg-white rounded-full p-8 shadow-inner">
+                <span class="text-8xl">🫘</span>
+              </div>
+            </div>
+            <!-- Coffee Bean Decorations -->
+            <div class="absolute -top-4 -right-4 w-6 h-8 bg-amber-800 rounded-full animate-bounce"></div>
+            <div class="absolute -bottom-2 -left-6 w-4 h-6 bg-amber-900 rounded-full animate-bounce delay-300"></div>
+            <div class="absolute top-8 -left-8 w-3 h-4 bg-amber-700 rounded-full animate-bounce delay-500"></div>
+          </div>
+          
+          <h3 class="text-5xl font-black bg-gradient-to-r from-amber-700 to-orange-700 bg-clip-text text-transparent mb-6">
+            No coffee beans yet! 
+          </h3>
+          <p class="text-2xl text-gray-600 mb-4 font-medium">Time to stock up on premium beans! 🫘</p>
+          <p class="text-lg text-gray-500 mb-12">Your coffee creations need the finest ingredients ☕</p>
+          
+          <%= link_to new_material_path, 
+              class: 'inline-flex items-center space-x-4 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-black py-6 px-12 rounded-3xl transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 text-xl group' do %>
+            <div class="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center group-hover:rotate-180 transition-transform duration-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+            </div>
+            <span>Add Your First Beans</span>
+            <span class="text-2xl">🫘</span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
