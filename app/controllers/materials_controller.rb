@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MaterialsController < ApplicationController
-  before_action :set_material, only: %i[show edit update]
+  before_action :set_material, only: %i[show edit update destroy]
   def index
     @materials = Material.all
   end
