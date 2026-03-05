@@ -15,8 +15,6 @@ AllCops:
   TargetRubyVersion: 3.4
   DisabledByDefault: false
   Exclude:
-    - "db/**/*"
-    - "config/**/*"
     - "bin/**/*"
     - "vendor/**/*"
 
