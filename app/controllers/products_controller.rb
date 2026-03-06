@@ -18,9 +18,9 @@ class ProductsController < ApplicationController
   def create
     @product = Product.new(product_params)
     if @product.save
-      redirect_to products_path, notice: 'Product was successfully created.'
+      redirect_to products_path, notice: t('.success')
     else
-      render :new
+      render :new, notice: t('.failure')
     end
   end
 
@@ -34,7 +34,7 @@ class ProductsController < ApplicationController
 
   def destroy
     @product.destroy
-    redirect_to products_path, notice: 'Product was successfully deleted.'
+    redirect_to products_path, notice: t('.success')
   end
 
   private

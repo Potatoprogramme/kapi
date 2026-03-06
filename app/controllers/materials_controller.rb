@@ -18,17 +18,17 @@ class MaterialsController < ApplicationController
   def create
     @material = Material.new(material_params)
     if @material.save
-      redirect_to materials_path, notice: 'Material created successfully.'
+      redirect_to materials_path, notice: t('.success')
     else
-      render :new, status: :unprocessable_content
+      render :new, status: :unprocessable_content, notice: t('.failure')
     end
   end
 
   def update
     if @material.update(material_params)
-      redirect_to material_path(@material), notice: 'Material updated successfully.'
+      redirect_to material_path(@material), notice: t('.success')
     else
-      render :edit, status: :unprocessable_content
+      render :edit, status: :unprocessable_content, notice: t('.failure')
     end
   end
 
@@ -36,7 +36,7 @@ class MaterialsController < ApplicationController
     @material = Material.find(params[:id])
     return unless @material.destroy
 
-    redirect_to materials_path
+    redirect_to materials_path, notice: t('.success')
   end
 
   private

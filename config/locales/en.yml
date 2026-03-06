@@ -29,3 +29,22 @@
 
 en:
   hello: "Hello world"
+  products:
+    create:
+      success: "Product was successfully created."
+      failure: "Could not create product."
+    update:
+      success: "Product was successfully updated."
+      failure: "Could not update product."
+    destroy:
+      success: "Product was successfully deleted."
+  materials:
+    create:
+      success: "Material was successfully created."
+      failure: "Could not create material."
+    update:
+      success: "Material was successfully updated"
+      failure: "Could not update material."
+    destroy:
+      success: "Material was successfully deleted."
+      failure: "Could not delete material."

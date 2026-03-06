@@ -1,0 +1,30 @@
+<div class="toast fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
+  <div class="flex flex-col items-end space-y-2">
+    <% flash.each do |key, message| %>
+      <% next if message.blank? %>
+      <div class="w-full max-w-xs">
+        <% if key.to_sym == :alert || key.to_sym == :error %>
+          <div class="flash-item p-3 rounded-lg border border-red-700 bg-red-600 text-white shadow-lg text-sm text-right ring-1 ring-red-700/30">
+            <%= message %>
+          </div>
+        <% else %>
+          <div class="flash-item p-3 rounded-lg border border-[#44624a] bg-white text-[#44624a] shadow-lg text-sm text-right ring-1 ring-[#44624a]">
+            <%= message %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        var toast = $('.toast');
+        if (toast.length === 0) return
+        setTimeout(function(){
+            toast.fadeOut(300, function() {
+                toast.remove();
+            });
+        }, 3000)
+    });
+</script>
