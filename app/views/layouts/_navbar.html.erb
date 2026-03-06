@@ -60,11 +60,13 @@
             </svg>
           </button>
 
-          <%= button_to "", session_path, method: :delete if authenticated? do %>
-            <svg width="800px" height="800px" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M1 1L8 1V2L2 2L2 13H8V14H1L1 1ZM10.8536 4.14645L14.1932 7.48614L10.8674 11.0891L10.1326 10.4109L12.358 8L4 8V7L12.2929 7L10.1464 4.85355L10.8536 4.14645Z" fill="#000000"/>
-            </svg>
-           <% end %>
+          <% if authenticated? %>
+            <%= button_to session_path, method: :delete, class: "group w-12 h-12 bg-gradient-to-r from-red-600 to-orange-700 hover:from-red-700 hover:to-red-800 rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" do %>
+              <svg class="w-5 h-5 text-white" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M1 1L8 1V2L2 2L2 13H8V14H1L1 1ZM10.8536 4.14645L14.1932 7.48614L10.8674 11.0891L10.1326 10.4109L12.358 8L4 8V7L12.2929 7L10.1464 4.85355L10.8536 4.14645Z" fill="currentColor"/>
+              </svg>
+            <% end %>
+          <% end %>
         </div>
       </div>
 
@@ -99,20 +101,29 @@
           <% end %>
 
           <!-- Mobile Actions -->
-          <div class="flex space-x-3 pt-4 border-t border-amber-100">
-            <button class="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center space-x-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-center justify-between gap-2 pt-4 border-t border-amber-100">
+            <%= link_to '#', class: "flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-amber-50 hover:bg-amber-100 rounded-lg text-amber-700 text-sm transition" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m1.6 8L5 3H3m4 10v6a1 1 0 001 1h10a1 1 0 001-1v-6M9 19h6"></path>
               </svg>
-              <span>Cart</span>
-            </button>
+              <span class="truncate">Cart</span>
+            <% end %>
             
-            <button class="flex-1 bg-gradient-to-r from-pink-400 to-rose-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center space-x-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <%= link_to '#', class: "flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-amber-50 hover:bg-amber-100 rounded-lg text-amber-700 text-sm transition" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
               </svg>
-              <span>Favorites</span>
-            </button>
+              <span class="truncate">Favorites</span>
+            <% end %>
+            
+            <% if authenticated? %>
+              <%= button_to session_path, method: :delete, class: "flex items-center gap-2 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition justify-center" do %>
+                <svg class="w-4 h-4" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M1 1L8 1V2L2 2L2 13H8V14H1L1 1ZM10.8536 4.14645L14.1932 7.48614L10.8674 11.0891L10.1326 10.4109L12.358 8L4 8V7L12.2929 7L10.1464 4.85355L10.8536 4.14645Z" fill="currentColor"/>
+                </svg>
+                <span>Logout</span>
+              <% end %>
+            <% end %>
           </div>
         </div>
       </div>
@@ -125,22 +136,22 @@
 <div class="fixed top-32 right-16 w-3 h-4 bg-amber-900 rounded-full opacity-30 animate-bounce delay-300 z-40 hidden lg:block"></div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    
-    mobileMenuButton.addEventListener('click', function() {
-      mobileMenu.classList.toggle('hidden');
-      
-      // Add smooth slide animation
-      if (!mobileMenu.classList.contains('hidden')) {
-        mobileMenu.style.opacity = '0';
-        mobileMenu.style.transform = 'translateY(-20px)';
-        setTimeout(() => {
-          mobileMenu.style.opacity = '1';
-          mobileMenu.style.transform = 'translateY(0)';
-          mobileMenu.style.transition = 'all 0.3s ease-out';
-        }, 10);
+  $(function() {
+    var $btn = $('#mobile-menu-button');
+    var $menu = $('#mobile-menu');
+
+    $btn.on('click', function() {
+      if ($menu.hasClass('hidden')) {
+        // show with fade + slide
+        $menu.removeClass('hidden').css({ display: 'none', opacity: 0 });
+        $menu.slideDown(180);
+        $menu.animate({ opacity: 1 }, { duration: 180, queue: false });
+      } else {
+        // hide with fade + slide then add hidden class
+        $menu.animate({ opacity: 0 }, { duration: 140, queue: false });
+        $menu.slideUp(180, function() {
+          $menu.addClass('hidden');
+        });
       }
     });
   });

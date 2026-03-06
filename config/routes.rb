@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
@@ -12,10 +14,11 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  root 'materials#index'
+  root 'home#index'
 
   resources :materials
   resources :products
+  get '/', to: 'home#index'
 
   post 'check_form', to: 'products#check_form'
 end

@@ -1,0 +1,154 @@
+<div class="min-h-screen bg-amber-50 font-serif overflow-x-hidden">
+
+  <!-- HERO -->
+  <section class="relative min-h-[88vh] grid grid-cols-1 lg:grid-cols-2 items-center gap-12 px-8 lg:px-24 py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-teal-50 overflow-hidden">
+
+    <!-- Background blobs -->
+    <div class="absolute -top-20 -right-20 w-96 h-96 bg-amber-900 rounded-full opacity-5 pointer-events-none"></div>
+    <div class="absolute bottom-16 left-8 w-48 h-48 bg-teal-400 rounded-full opacity-10 pointer-events-none"></div>
+    <div class="absolute top-1/3 left-1/2 w-28 h-28 bg-orange-400 rounded-full opacity-10 pointer-events-none"></div>
+
+    <!-- Hero Text -->
+    <div class="relative z-10">
+      <p class="text-xs font-bold tracking-[0.3em] uppercase text-teal-600 mb-4 font-sans">Welcome to KAPI</p>
+
+      <h1 class="text-6xl lg:text-7xl font-light leading-tight text-amber-900 mb-6">
+        Your Coffee,<br>
+        <em class="text-orange-500 italic">Curated.</em>
+      </h1>
+
+      <p class="text-lg text-amber-700 leading-relaxed max-w-md mb-10 font-sans font-light">
+        Discover premium beans from around the world, handpicked for every palate. From single-origins to blends — find your perfect cup.
+      </p>
+
+      <div class="flex flex-wrap gap-4">
+        <%= link_to "Explore Beans", materials_path,
+              class: "bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-sans font-semibold text-sm shadow-lg shadow-orange-200 hover:-translate-y-0.5 transition-all duration-200" %>
+        <%= link_to "Browse Menu", products_path,
+              class: "border-2 border-amber-800 text-amber-800 hover:bg-amber-800 hover:text-white px-8 py-3 rounded-full font-sans font-semibold text-sm transition-all duration-200" %>
+      </div>
+    </div>
+
+    <!-- Hero Visual -->
+    <div class="hidden lg:flex flex-col items-center gap-8 relative z-10">
+
+      <!-- CSS Coffee Cup -->
+      <div class="relative w-44 h-52">
+        <!-- Steam -->
+        <div class="absolute -top-6 left-14 flex gap-2">
+          <div class="w-1.5 h-8 bg-amber-400 rounded-full opacity-30 animate-bounce" style="animation-delay:0s"></div>
+          <div class="w-1.5 h-6 bg-amber-400 rounded-full opacity-30 animate-bounce" style="animation-delay:0.3s"></div>
+          <div class="w-1.5 h-7 bg-amber-400 rounded-full opacity-30 animate-bounce" style="animation-delay:0.6s"></div>
+        </div>
+        <!-- Cup Body -->
+        <div class="absolute top-10 left-5 w-36 h-28 bg-gradient-to-br from-white to-amber-100 rounded-b-3xl border-2 border-amber-300 overflow-hidden shadow-xl">
+          <div class="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-b from-amber-500 to-amber-900 rounded-b-3xl"></div>
+          <div class="absolute top-3 left-3 w-3 h-10 bg-white opacity-30 rounded-full -rotate-6"></div>
+        </div>
+        <!-- Handle -->
+        <div class="absolute top-14 right-2 w-8 h-14 border-4 border-amber-300 border-l-0 rounded-r-2xl"></div>
+        <!-- Saucer -->
+        <div class="absolute bottom-5 left-0 w-full h-5 bg-gradient-to-b from-amber-200 to-amber-400 rounded-full shadow-md"></div>
+      </div>
+
+      <!-- Origin Tags -->
+      <div class="flex flex-col gap-3">
+        <span class="bg-white border border-amber-200 text-amber-700 text-xs font-sans px-5 py-2.5 rounded-full shadow-sm">☕ Ethiopia Yirgacheffe</span>
+        <span class="bg-white border border-amber-200 text-amber-700 text-xs font-sans px-5 py-2.5 rounded-full shadow-sm">🌿 Colombian Blend</span>
+        <span class="bg-white border border-amber-200 text-amber-700 text-xs font-sans px-5 py-2.5 rounded-full shadow-sm">🏔️ Guatemala Antigua</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES STRIP -->
+  <section class="bg-teal-500 px-8 py-6 flex flex-wrap items-center justify-center gap-6 lg:gap-0">
+    <div class="flex items-center gap-3 px-8 text-white">
+      <span class="text-3xl">🫘</span>
+      <div>
+        <p class="font-sans font-bold text-sm">Single Origins</p>
+        <p class="font-sans text-xs text-teal-100">Traceable to the farm</p>
+      </div>
+    </div>
+    <div class="hidden lg:block w-px h-10 bg-white/30"></div>
+    <div class="flex items-center gap-3 px-8 text-white">
+      <span class="text-3xl">🔥</span>
+      <div>
+        <p class="font-sans font-bold text-sm">Fresh Roasted</p>
+        <p class="font-sans text-xs text-teal-100">Within 48 hours of order</p>
+      </div>
+    </div>
+    <div class="hidden lg:block w-px h-10 bg-white/30"></div>
+    <div class="flex items-center gap-3 px-8 text-white">
+      <span class="text-3xl">📦</span>
+      <div>
+        <p class="font-sans font-bold text-sm">Free Shipping</p>
+        <p class="font-sans text-xs text-teal-100">On orders over ₱500</p>
+      </div>
+    </div>
+    <div class="hidden lg:block w-px h-10 bg-white/30"></div>
+    <div class="flex items-center gap-3 px-8 text-white">
+      <span class="text-3xl">💛</span>
+      <div>
+        <p class="font-sans font-bold text-sm">Curated Picks</p>
+        <p class="font-sans text-xs text-teal-100">Expertly selected blends</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORY CARDS -->
+  <section class="bg-amber-50 px-8 lg:px-24 py-24">
+    <h2 class="text-4xl font-light text-amber-900 text-center mb-14">What are you brewing?</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Beans Card -->
+      <div class="group relative rounded-2xl overflow-hidden min-h-80 flex items-end shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
+        <div class="absolute inset-0 bg-gradient-to-br from-amber-400 to-amber-900 group-hover:scale-105 transition-transform duration-500"></div>
+        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_20%,white,transparent_60%)]"></div>
+        <div class="relative p-7 bg-gradient-to-t from-black/60 to-transparent w-full">
+          <div class="text-3xl mb-2">🫘</div>
+          <h3 class="text-white text-xl font-light mb-2">Coffee Beans</h3>
+          <p class="text-white/75 font-sans text-sm mb-4 leading-relaxed">Explore our full selection of whole beans and grounds from top growing regions.</p>
+          <%= link_to "Shop Beans →", materials_path,
+                class: "text-white font-sans font-bold text-sxm border-b-2 border-white/50 hover:border-white pb-0.5 transition-colors" %>
+        </div>
+      </div>
+
+      <!-- Menu Card -->
+      <div class="group relative rounded-2xl overflow-hidden min-h-80 flex items-end shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
+        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-teal-800 group-hover:scale-105 transition-transform duration-500"></div>
+        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_20%,white,transparent_60%)]"></div>
+        <div class="relative p-7 bg-gradient-to-t from-black/60 to-transparent w-full">
+          <div class="text-3xl mb-2">☕</div>
+          <h3 class="text-white text-xl font-light mb-2">Coffee Menu</h3>
+          <p class="text-white/75 font-sans text-sm mb-4 leading-relaxed">Ready-to-order drinks crafted by our baristas — hot, cold, and everything in between.</p>
+          <%= link_to "View Menu →", products_path,
+                class: "text-white font-sans font-bold text-sm border-b-2 border-white/50 hover:border-white pb-0.5 transition-colors" %>
+        </div>
+      </div>
+
+      <!-- Favorites Card -->
+      <div class="group relative rounded-2xl overflow-hidden min-h-80 flex items-end shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
+        <div class="absolute inset-0 bg-gradient-to-br from-rose-400 to-rose-800 group-hover:scale-105 transition-transform duration-500"></div>
+        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_20%,white,transparent_60%)]"></div>
+        <div class="relative p-7 bg-gradient-to-t from-black/60 to-transparent w-full">
+          <div class="text-3xl mb-2">♥</div>
+          <h3 class="text-white text-xl font-light mb-2">Your Favorites</h3>
+          <p class="text-white/75 font-sans text-sm mb-4 leading-relaxed">Save the coffees you love and come back to them anytime.</p>
+          <%= link_to "See Favorites →",
+                class: "text-white font-sans font-bold text-sm border-b-2 border-white/50 hover:border-white pb-0.5 transition-colors" %>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- QUOTE BANNER -->
+  <section class="bg-amber-900 text-white text-center px-8 py-24">
+    <blockquote class="text-2xl lg:text-3xl font-light italic max-w-2xl mx-auto mb-5 leading-relaxed">
+      "Coffee is not just a drink — it's a ritual, a comfort, a moment to yourself."
+    </blockquote>
+    <cite class="font-sans text-sm text-amber-300/60 tracking-widest not-italic uppercase">— The KAPI Philosophy</cite>
+  </section>
+
+</div>

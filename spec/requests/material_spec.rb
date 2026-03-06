@@ -6,6 +6,11 @@ RSpec.describe 'Materials', type: :request do
   let!(:material) { create(:material) }
   let(:valid_attributes) { attributes_for(:material) }
   let(:invalid_attributes) { attributes_for(:material, name: nil) }
+
+  before do
+    user = create(:user)
+    post session_path, params: { email_address: user.email_address, password: 'password' }
+  end
   describe 'GET /index' do
     it 'assigns all materials to @materials and renders materials index' do
       get materials_path
@@ -36,7 +41,7 @@ RSpec.describe 'Materials', type: :request do
         expect do
           post materials_path, params: { material: invalid_attributes }
         end.not_to change(Material, :count)
-        expect(response).to have_http_status(:unprocessable_content)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end
@@ -67,12 +72,12 @@ RSpec.describe 'Materials', type: :request do
       it 'does not update material and redirects back to edit form' do
         patch material_path(material), params: { material: invalid_attributes }
         expect(material.reload.name).to eq(material.name)
-        expect(response).to have_http_status(:unprocessable_content)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end
 
-  describe 'DELETE products#destroy' do
+  describe 'DELETE materials#destroy' do
     it 'deletes the specified material' do
       expect do
         delete material_path(material)
