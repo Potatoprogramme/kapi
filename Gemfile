@@ -60,6 +60,12 @@ group :development, :test do
 
   # Faker
   gem 'faker'
+
+  # DotENV
+  gem 'dotenv'
+
+  # mission_control-jobs
+  gem 'mission_control-jobs'
 end
 
 group :development do
