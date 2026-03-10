@@ -5,6 +5,6 @@ class GuestsCleanupJob < ApplicationJob
 
   def perform
     Rails.logger.info "Starting GuestsCleanupJob at #{Time.current}"
-    puts 'Job is working!'
+    Rails.logger.debug 'Job is working!'
   end
 end
