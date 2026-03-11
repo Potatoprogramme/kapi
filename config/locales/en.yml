@@ -49,3 +49,7 @@ en:
       success: "Material was successfully deleted."
       failure: "Could not delete material."
       exists: "This material is being used."
+  product_categories:
+    create:
+      success: "Category successfully created."
+      failure: "Could not create category."
