@@ -19,7 +19,6 @@ Rails.application.routes.draw do
 
   resources :materials
   resources :products
+  resources :product_categories
   get '/', to: 'home#index'
-
-  post 'check_form', to: 'products#check_form'
 end
