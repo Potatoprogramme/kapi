@@ -103,6 +103,78 @@
               <% end %>
             </div>
 
+            <div class="space-y-2 mb-4">
+              <label class="block text-base font-bold text-gray-800">
+                <div class="flex items-center space-x-2 mb-1">
+                  <div class="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="text-white size-5" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                  </svg>
+                  </div>
+                  <span>Add Ingredients</span>
+                </div>
+              </label>
+              <% if @materials.any? %>
+                <div class="my-4">
+                  <select name="materials" id="materials" class="w-120">
+                    <% @materials.each do |material| %>
+                      <option value="<%= material.id %>"><%= material.name %></option>
+                    <% end %>
+                  </select>
+                  <button type="button" id="addIng" class="bg-blue-200 px-4 py-1 text-blue-800 rounded-md font-bold">Add</button>
+                </div>
+              <% end %>
+
+              <div id="ingDisplay" class=" bg-orange-50 w-auto">
+
+              </div>
+              <script>
+                var ingList = []; // array for storing the ingredients
+            
+                // Adding ingredients to the list
+                $('#addIng').on("click", function(){
+                  let selectedId = $('#materials').val();
+                  let selectedName = $('#materials option:selected').text();
+
+                  ingList.push(selectedId);
+
+                  $('#ingDisplay').append(`
+                    <div id="ing-${selectedId}" class="flex gap-2 items-center">
+                      <span>${selectedName}</span>
+                      <button type="button" class="remove-ing text-red-500" data-id="${selectedId}">Remove</button>
+                    </div>
+                  `)
+
+                  updateHiddenInputs();
+                });
+
+                // Removing an ingredient
+                $(document).on('click', '.remove-ing', function(){
+                  let id = $(this).data("id").toString();
+
+                  // Remove from array
+                  ingList = ingList.filter(i => i.id !== id);
+
+                  // Remove from display
+                  $(`#ing-${id}`).remove();
+
+                  // Update hidden inputs
+                  updateHiddenInputs();
+                });
+                // Updating Form Input
+                function updateHiddenInputs(){
+                  $("input[name='myIngredients[]']").remove();
+
+                  ingList.forEach(function(item){
+                    $('<input>').attr({
+                      type:  'hidden',
+                      name:  'myIngredients[]',
+                      value: item.id
+                    }).appendTo('#ingDisplay');
+                  });
+                }
+              </script>
+            </div>
             <!-- Coffee Inspiration Examples -->
             <div class="mb-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-100">
               <h3 class="text-sm font-bold text-amber-800 mb-2 flex items-center space-x-1.5">

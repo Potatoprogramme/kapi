@@ -11,13 +11,19 @@ class ProductsController < ApplicationController
 
   def new
     @product = Product.new
+    load_form_data
   end
 
-  def edit; end
+  def edit
+    load_form_data
+  end
 
   def create
     @product = Product.new(product_params)
     if @product.save
+      ingredient_ids.each do |material_id|
+        Rails.logger.info('KEYWORD ING' + material_id)
+      end
       redirect_to products_path, notice: t('.success')
     else
       render :new, notice: t('.failure')
@@ -44,6 +50,14 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.expect(product: %i[name thumbnail])
+    params.expect(product: %i[name thumbnail myIngredients])
+  end
+
+  def load_form_data
+    @materials = Material.all
+  end
+
+  def ingredient_ids
+    params.expect(myIngredients: [])
   end
 end
