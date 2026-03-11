@@ -48,3 +48,4 @@ en:
     destroy:
       success: "Material was successfully deleted."
       failure: "Could not delete material."
+      exists: "This material is being used."

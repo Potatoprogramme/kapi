@@ -20,14 +20,15 @@ class ProductsController < ApplicationController
 
   def create
     @product = Product.new(product_params)
-    if @product.save
+    ActiveRecord::Base.transaction do
+      @product.save!
       ingredient_ids.each do |material_id|
-        Rails.logger.info('KEYWORD ING' + material_id)
+        Ingredient.create!(product_id: @product.id, material_id: material_id)
       end
-      redirect_to products_path, notice: t('.success')
-    else
-      render :new, notice: t('.failure')
     end
+    redirect_to products_path, notice: t('.success')
+  rescue ActiveRecord::RecordInvalid
+    render :new, status: :unprocessable_content, notice: t('.failure')
   end
 
   def update

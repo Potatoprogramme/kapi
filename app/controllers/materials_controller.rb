@@ -33,10 +33,12 @@ class MaterialsController < ApplicationController
   end
 
   def destroy
-    @material = Material.find(params[:id])
-    return unless @material.destroy
-
-    redirect_to materials_path, notice: t('.success')
+    if Ingredient.exists?(material_id: @material.id)
+      redirect_back_or_to(materials_path, notice: t('.failure'))
+    else
+      @material.destroy
+      redirect_to materials_path, notice: t('.exists')
+    end
   end
 
   private

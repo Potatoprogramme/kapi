@@ -129,14 +129,17 @@
 
               </div>
               <script>
-                var ingList = []; // array for storing the ingredients
+                var ingList = []; // array for storing the ingredients (objects with id and name)
             
                 // Adding ingredients to the list
                 $('#addIng').on("click", function(){
                   let selectedId = $('#materials').val();
                   let selectedName = $('#materials option:selected').text();
 
-                  ingList.push(selectedId);
+                  // Prevent duplicates
+                  if (ingList.some(i => i.id === selectedId)) return;
+
+                  ingList.push({ id: selectedId, name: selectedName });
 
                   $('#ingDisplay').append(`
                     <div id="ing-${selectedId}" class="flex gap-2 items-center">
@@ -161,9 +164,11 @@
                   // Update hidden inputs
                   updateHiddenInputs();
                 });
+
                 // Updating Form Input
                 function updateHiddenInputs(){
-                  $("input[name='myIngredients[]']").remove();
+                  // Remove only dynamically added hidden inputs inside ingDisplay
+                  $("#ingDisplay input[name='myIngredients[]']").remove();
 
                   ingList.forEach(function(item){
                     $('<input>').attr({
