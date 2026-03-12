@@ -25,10 +25,12 @@ class ProductsController < ApplicationController
       ingredient_ids.each do |material_id|
         Ingredient.create!(product_id: @product.id, material_id: material_id)
       end
+    rescue ActiveRecord::RecordInvalid => e
+      load_form_data
+      e.record.error.full_message.to_sentence
+      render :new, status: :unprocessable_content, notice: t('.failure')
     end
     redirect_to products_path, notice: t('.success')
-  rescue ActiveRecord::RecordInvalid
-    render :new, status: :unprocessable_content, notice: t('.failure')
   end
 
   def update
