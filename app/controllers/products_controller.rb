@@ -28,7 +28,7 @@ class ProductsController < ApplicationController
     rescue ActiveRecord::RecordInvalid => e
       load_form_data
       e.record.error.full_message.to_sentence
-      render :new, status: :unprocessable_content, notice: t('.failure')
+      render :new, status: :unprocessable_content, notice: t('.success')
     end
     redirect_to products_path, notice: t('.success')
   end
