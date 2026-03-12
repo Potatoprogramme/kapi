@@ -72,13 +72,13 @@
                   <span>Coffee Category</span>
                 </div>
               <% end %>
-              <select name="product_category">
+              <select name="product[product_category_id]">
                 <% if @categories.any? %>
                   <% @categories.each do |category|%>
                     <option value="<%= category.id %>"><%= category.name %> </option>
                   <% end %>
                 <% else %>
-                  <option value="<%= category.id %>"><%= category.name %> </option>
+                  <option value="NULL" disabled>No Categories Available </option>
                 <% end %>
               </select>
               <div class="flex items-center space-x-1.5 text-xs text-gray-500">

@@ -51,7 +51,7 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.expect(product: %i[name thumbnail myIngredients product_category])
+    params.expect(product: %i[name thumbnail myIngredients product_category_id])
   end
 
   def load_form_data
