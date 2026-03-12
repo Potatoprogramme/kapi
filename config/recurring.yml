@@ -17,4 +17,4 @@ development:
   periodic_cleanup:
     class: GuestsCleanupJob
     queue: background
-    schedule: every 35 seconds
+    schedule: every 15 seconds

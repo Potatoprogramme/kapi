@@ -34,10 +34,10 @@ class MaterialsController < ApplicationController
 
   def destroy
     if Ingredient.exists?(material_id: @material.id)
-      redirect_back_or_to(materials_path, notice: t('.failure'))
+      redirect_back_or_to(materials_path, notice: t('.exists'))
     else
       @material.destroy
-      redirect_to materials_path, notice: t('.exists')
+      redirect_to materials_path, notice: t('.success')
     end
   end
 

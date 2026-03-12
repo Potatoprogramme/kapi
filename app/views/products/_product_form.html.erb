@@ -10,7 +10,6 @@
         <span>Back to Coffee Collection</span>
       <% end %>
     </div>
-
     <!-- Form Header -->
     <div class="text-center mb-8">
       <div class="relative mb-5">
@@ -31,13 +30,11 @@
         <div class="absolute -top-1 -right-1 w-3 h-3.5 bg-amber-800 rounded-full animate-bounce"></div>
         <div class="absolute -bottom-0.5 -left-2 w-2.5 h-3 bg-amber-900 rounded-full animate-bounce delay-300"></div>
       </div>
-      
       <h1 class="text-3xl font-black bg-gradient-to-r from-amber-700 to-orange-700 bg-clip-text text-transparent mb-2">
         <%= @product.new_record? ? 'Add New Coffee Blend' : 'Edit Coffee Blend' %>
       </h1>
       <p class="text-sm text-gray-600 font-medium">Create your perfect coffee blend ✨</p>
     </div>
-
     <!-- Coffee Form -->
     <div class="max-w-xl mx-auto">
       <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden">
@@ -53,13 +50,11 @@
                   <span>Coffee Name</span>
                 </div>
               <% end %>
-        
               <%= form.text_field :name, 
                   id: 'product_name',
                   class: "w-full px-4 py-2.5 text-sm font-medium border-2 border-amber-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200/50 transition-all duration-300 bg-white/80 placeholder-gray-400",
                   placeholder: "e.g., Colombian Supreme, Ethiopian Sunrise...",
                   required: true %>
-              
               <div class="flex items-center space-x-1.5 text-xs text-gray-500">
                 <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -67,7 +62,32 @@
                 <span>Give your coffee a memorable name</span>
               </div>
             </div>
-             
+            <!-- Product Category Field-->
+            <div class="space-y-2 mb-4">
+              <%= form.label :category, class: "block text-base font-bold text-gray-800 mb-1" do %>
+                <div class="flex items-center space-x-2">
+                  <div class="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+                    <span class="text-xs">☕</span>
+                  </div>
+                  <span>Coffee Category</span>
+                </div>
+              <% end %>
+              <select name="product_category">
+                <% if @categories.any? %>
+                  <% @categories.each do |category|%>
+                    <option value="<%= category.id %>"><%= category.name %> </option>
+                  <% end %>
+                <% else %>
+                  <option value="<%= category.id %>"><%= category.name %> </option>
+                <% end %>
+              </select>
+              <div class="flex items-center space-x-1.5 text-xs text-gray-500">
+                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Assign a label to your coffee</span>
+              </div>
+            </div>
             <div class="space-y-2 mb-4">
               <label class="block text-base font-bold text-gray-800">
                 <div class="flex items-center space-x-2 mb-1">
@@ -77,7 +97,6 @@
                   <span>Thumbnail</span>
                 </div>
               </label>
-
               <label class="group flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-amber-300 hover:border-amber-500 rounded-xl cursor-pointer bg-amber-50/50 hover:bg-amber-50 transition-all duration-300">
                 <div class="flex flex-col items-center justify-center space-y-1.5 text-center px-4">
                   <div class="w-8 h-8 bg-gradient-to-r from-amber-400 to-orange-500 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
@@ -102,14 +121,13 @@
                 </div>
               <% end %>
             </div>
-
             <div class="space-y-2 mb-4">
               <label class="block text-base font-bold text-gray-800">
                 <div class="flex items-center space-x-2 mb-1">
                   <div class="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="text-white size-5" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                  </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="text-white size-5" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                    </svg>
                   </div>
                   <span>Add Ingredients</span>
                 </div>
@@ -124,13 +142,11 @@
                   <button type="button" id="addIng" class="bg-blue-200 px-4 py-1 text-blue-800 rounded-md font-bold">Add</button>
                 </div>
               <% end %>
-
               <div id="ingDisplay" class=" bg-orange-50 w-auto">
-
               </div>
               <script>
                 var ingList = []; // array for storing the ingredients (objects with id and name)
-            
+
                 // Adding ingredients to the list
                 $('#addIng').on("click", function(){
                   let selectedId = $('#materials').val();
@@ -211,7 +227,6 @@
                 </div>
               </div>
             </div>
-
             <!-- Error Messages -->
             <% if @product.errors.any? %>
               <div class="mb-4 bg-red-50 border border-red-200 rounded-xl p-4">
@@ -233,7 +248,6 @@
                 </ul>
               </div>
             <% end %>
-
             <!-- Action Buttons -->
             <div class="flex space-x-3 pt-2">
               <%= form.submit "Save Coffee Blend", 
@@ -243,7 +257,6 @@
                 Cancel
               <% end %>
             </div>
-
           <% end %>
         </div>
       </div>

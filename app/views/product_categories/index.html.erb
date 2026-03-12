@@ -10,12 +10,6 @@
         New Category
       <% end %>
     </div>
-    <!-- Flash Messages -->
-    <% if notice.present? %>
-      <div class="mb-4 p-3 bg-green-100 border border-green-300 text-green-800 rounded-lg text-sm">
-        <%= notice %>
-      </div>
-    <% end %>
     <!-- Categories List -->
     <% if @categories.any? %>
       <div class="flex flex-wrap gap-4">
