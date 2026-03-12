@@ -1,26 +1,40 @@
-<%= form_with model: @category, local: true do |form| %>
-  <% if @category.errors.any? %>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-      <ul>
-        <% @category.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
+<div class="max-w-2xl mx-auto bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 shadow-md rounded-lg p-6">
+  <h2 class="text-3xl font-bold text-amber-800 mb-6 text-center">
+    <span class="inline-flex items-center">
+      Create or Edit Coffee Category
+    </span>
+  </h2>
+  <%= form_with model: @category, local: true do |form| %>
+    <% if @category.errors.any? %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <ul class="list-disc pl-5">
+          <% @category.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <!-- Category Name -->
+    <div class="mb-6">
+      <%= form.label :name, "Category Name", class: "block text-sm font-medium text-amber-800" %>
+      <%= form.text_field :name, placeholder: "e.g., Espresso Blends", class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" %>
+    </div>
+    <!-- Description -->
+    <div class="mb-6">
+      <%= form.label :description, "Description", class: "block text-sm font-medium text-amber-800" %>
+      <%= form.text_area :description, placeholder: "Write a short description of the category...", rows: 3, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" %>
+    </div>
+    <!-- Color Picker -->
+    <div class="mb-6">
+      <%= form.label :color, "Category Color", class: "block text-sm font-medium text-amber-800" %>
+      <div class="flex items-center gap-4">
+        <%= form.color_field :color, class: "mt-1 block w-20 h-10 border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" %>
+        <span class="text-sm text-gray-500">Pick a color to represent this category.</span>
+      </div>
+    </div>
+    <!-- Submit Button -->
+    <div class="flex justify-end">
+      <%= form.submit "Save Category", class: "px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-md shadow hover:from-amber-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500" %>
     </div>
   <% end %>
-  <div>
-    <%= form.label :name, "Category Name" %>
-    <%= form.text_field :name, class: "border-2 border-black" %>
-  </div>
-  <div>
-    <%= form.label :description %>
-    <%= form.text_field :description, class: "border-2 border-black" %>
-  </div>
-  <div>
-    <%= form.label :color %>
-    <%= form.color_field :color, class: "border-2 border-black" %>
-  </div>
-  <div>
-    <%= form.submit "Save", class: "border-2 border-black p-2" %>
-  </div>
-<% end %>
+</div>
