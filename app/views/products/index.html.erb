@@ -14,8 +14,8 @@
       <% if @products.present? %>
         <%= link_to new_product_path,
             class: 'inline-flex items-center bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 shadow-sm' do %>
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
           </svg>
           <span class="text-sm">Add New Coffee</span>
         <% end %>
@@ -28,12 +28,9 @@
           <% coffee_origins = ['Ethiopian', 'Colombian', 'Brazilian', 'Guatemalan', 'Costa Rican', 'Jamaican', 'Hawaiian', 'Kenyan'] %>
           <% roast_levels = ['Light Roast', 'Medium Roast', 'Dark Roast', 'French Roast'] %>
           <% coffee_types = ['Arabica', 'Robusta', 'Blend', 'Single Origin'] %>
-          
           <div class="group bg-white/80 backdrop-blur-xl rounded-2xl shadow-md hover:shadow-xl border border-white/20 overflow-hidden transition-all duration-500 transform hover:-translate-y-1 hover:rotate-1">
-            
             <!-- Coffee Bag/Cup Image with Steam Animation -->
             <div class="relative bg-gradient-to-br <%= cycle('from-amber-100 via-orange-200 to-yellow-200', 'from-orange-100 via-red-200 to-pink-200', 'from-yellow-100 via-amber-200 to-orange-200', 'from-red-100 via-orange-200 to-amber-200', 'from-brown-100 via-amber-200 to-yellow-200') %> h-40 overflow-hidden">
-
               <% if product.thumbnail.attached? %>
                 <%= image_tag product.thumbnail, class: 'absolute inset-0 w-full h-full object-cover' %>
                 <div class="absolute inset-0 bg-black/10"></div>
@@ -56,14 +53,12 @@
                   </div>
                 </div>
               <% end %>
-
               <!-- Product ID Badge -->
               <div class="absolute top-3 right-3 z-10">
                 <div class="bg-white/90 backdrop-blur-sm <%= cycle('text-amber-600', 'text-orange-600', 'text-yellow-600', 'text-red-600') %> text-xs font-black px-2.5 py-1 rounded-full shadow-md">
                   #<%= product.id.to_s.rjust(3, '0') %>
                 </div>
               </div>
-
               <!-- Roast Level Indicator -->
               <div class="absolute bottom-2 left-3 z-10">
                 <div class="bg-amber-800/80 text-white text-xs font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
@@ -71,20 +66,17 @@
                 </div>
               </div>
             </div>
-
             <!-- Coffee Product Content -->
             <div class="p-4">
               <!-- Coffee Name -->
               <h3 class="text-base font-black text-gray-800 mb-1 line-clamp-1 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-amber-700 group-hover:to-orange-700 group-hover:bg-clip-text transition-all duration-300">
                 <%= link_to product.name, product_path(product) %>
               </h3>
-              
               <!-- Origin & Type -->
               <p class="text-xs text-gray-500 font-medium mb-3 flex items-center space-x-1">
                 <span class="text-amber-600">🌍</span>
                 <span><%= coffee_origins.sample %> · <%= coffee_types.sample %></span>
               </p>
-              
               <!-- Coffee Price Display -->
               <div class="mb-3 px-3 py-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100">
                 <div class="flex items-center justify-between">
@@ -97,7 +89,6 @@
                   </div>
                 </div>
               </div>
-
               <!-- Coffee Rating & Tasting Notes -->
               <div class="mb-3 px-3 py-2 bg-amber-50 rounded-xl border border-amber-100">
                 <div class="flex items-center justify-between mb-1">
@@ -116,7 +107,6 @@
                   <%= ['Notes of chocolate & vanilla', 'Nutty with caramel finish', 'Fruity & floral aroma', 'Rich & bold flavor', 'Smooth & creamy'].sample %>
                 </p>
               </div>
-
               <!-- Brewing Methods -->
               <div class="mb-3 flex flex-wrap gap-1">
                 <% ['Espresso', 'Pour Over', 'French Press', 'Cold Brew'].sample(2).each do |method| %>
@@ -125,7 +115,6 @@
                   </span>
                 <% end %>
               </div>
-
               <!-- Action Buttons -->
               <div class="space-y-2">
                 <!-- View & Edit Row -->
@@ -140,7 +129,6 @@
                     </div>
                   <% end %>
                 </div>
-
                 <!-- Add to Cart Style Button -->
                 <button class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 text-xs group shadow hover:shadow-md">
                   <div class="flex items-center justify-center space-x-1.5">
@@ -150,7 +138,6 @@
                     <span>Add to Cart</span>
                   </div>
                 </button>
-
                 <!-- Delete Button -->
                 <%= button_to product_path(product), method: :delete,
                     class: 'w-full bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 border-none text-xs group shadow hover:shadow-md',
@@ -190,13 +177,11 @@
             <div class="absolute -top-4 -right-4 w-6 h-8 bg-amber-800 rounded-full animate-bounce"></div>
             <div class="absolute -bottom-2 -left-6 w-4 h-6 bg-amber-900 rounded-full animate-bounce delay-300"></div>
           </div>
-          
           <h3 class="text-5xl font-black bg-gradient-to-r from-amber-700 to-orange-700 bg-clip-text text-transparent mb-6">
             No coffee yet! 
           </h3>
           <p class="text-2xl text-gray-600 mb-4 font-medium">Time to brew something amazing! ☕</p>
           <p class="text-lg text-gray-500 mb-12">Your customers are craving the perfect cup 🤤</p>
-          
           <%= link_to new_product_path, 
               class: 'inline-flex items-center space-x-4 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-black py-6 px-12 rounded-3xl transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 text-xl group' do %>
             <div class="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center group-hover:rotate-180 transition-transform duration-500">

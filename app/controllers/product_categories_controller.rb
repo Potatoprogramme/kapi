@@ -15,7 +15,7 @@ class ProductCategoriesController < ApplicationController
     if @category.save
       redirect_to product_categories_path, notice: t('.success')
     else
-      render :new, unprocessable_content, notice: t('.failure')
+      render :new, status: :unprocessable_content
     end
   end
 

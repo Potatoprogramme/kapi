@@ -1,265 +1,289 @@
 <div class="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-  <div class="container mx-auto px-4 py-6">
-    <!-- Back Button -->
-    <div class="mb-4">
-      <%= link_to products_path, 
-          class: 'inline-flex items-center space-x-1.5 text-sm text-amber-700 hover:text-amber-800 font-medium transition-colors duration-200' do %>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+  <div class="max-w-2xl mx-auto px-4 py-10">
+    <%# Back Button %>
+    <div class="mb-8">
+      <%= link_to products_path, class: "inline-flex items-center gap-2 text-sm text-amber-700 hover:text-amber-900 font-medium transition-colors duration-200 group" do %>
+        <svg class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
-        <span>Back to Coffee Collection</span>
+        Back to Coffee Collection
       <% end %>
     </div>
-    <!-- Form Header -->
-    <div class="text-center mb-8">
-      <div class="relative mb-5">
-        <div class="bg-gradient-to-br from-amber-200 via-orange-200 to-yellow-200 rounded-full p-8 inline-block shadow-xl">
-          <div class="bg-white rounded-full p-4 shadow-inner">
-            <span class="text-4xl">☕</span>
+    <%# Page Header %>
+    <div class="text-center mb-10">
+      <%# Cup with steam %>
+      <div class="relative inline-block mb-5">
+        <%# Steam lines %>
+        <div class="absolute -top-5 left-1/2 -translate-x-1/2 flex gap-1.5">
+          <div class="w-1 h-6 bg-amber-300/70 rounded-full" style="animation: steamRise 2s ease-in-out infinite; animation-delay: 0s;"></div>
+          <div class="w-1 h-8 bg-orange-300/70 rounded-full" style="animation: steamRise 2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+          <div class="w-1 h-5 bg-amber-300/70 rounded-full" style="animation: steamRise 2s ease-in-out infinite; animation-delay: 0.8s;"></div>
+        </div>
+        <%# Coffee cup icon %>
+        <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-200">
+          <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+            <span class="text-3xl">☕</span>
           </div>
         </div>
-        <!-- Steam Animation -->
-        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
-          <div class="flex space-x-1">
-            <div class="w-1 h-7 bg-amber-400/60 rounded-full animate-pulse"></div>
-            <div class="w-1 h-5 bg-orange-400/60 rounded-full animate-pulse delay-100"></div>
-            <div class="w-1 h-8 bg-yellow-400/60 rounded-full animate-pulse delay-200"></div>
-          </div>
-        </div>
-        <!-- Coffee Beans -->
-        <div class="absolute -top-1 -right-1 w-3 h-3.5 bg-amber-800 rounded-full animate-bounce"></div>
-        <div class="absolute -bottom-0.5 -left-2 w-2.5 h-3 bg-amber-900 rounded-full animate-bounce delay-300"></div>
+        <%# Floating beans %>
+        <div class="absolute -top-1 -right-2 w-3 h-4 bg-amber-800 rounded-full" style="animation: floatBean 3s ease-in-out infinite;"></div>
+        <div class="absolute -bottom-1 -left-2 w-2.5 h-3 bg-amber-900 rounded-full" style="animation: floatBean 3s ease-in-out infinite; animation-delay: 1.5s;"></div>
       </div>
-      <h1 class="text-3xl font-black bg-gradient-to-r from-amber-700 to-orange-700 bg-clip-text text-transparent mb-2">
-        <%= @product.new_record? ? 'Add New Coffee Blend' : 'Edit Coffee Blend' %>
+      <h1 class="text-3xl font-black text-amber-900 tracking-tight mb-1">
+        <%= @product.new_record? ? "Add New Blend" : "Edit Coffee Blend" %>
       </h1>
-      <p class="text-sm text-gray-600 font-medium">Create your perfect coffee blend ✨</p>
+      <p class="text-sm text-amber-600/80 font-medium">
+        <%= @product.new_record? ? "Craft your perfect coffee blend ✨" : "Update your blend details ✨" %>
+      </p>
     </div>
-    <!-- Coffee Form -->
-    <div class="max-w-xl mx-auto">
-      <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-        <div class="p-6">
-          <%= form_with(model: @product, local: true, multipart: true) do |form| %>
-            <!-- Coffee Name Field -->
-            <div class="space-y-2 mb-4">
-              <%= form.label :name, class: "block text-base font-bold text-gray-800 mb-1" do %>
-                <div class="flex items-center space-x-2">
-                  <div class="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-                    <span class="text-xs">☕</span>
-                  </div>
-                  <span>Coffee Name</span>
-                </div>
-              <% end %>
-              <%= form.text_field :name, 
-                  id: 'product_name',
-                  class: "w-full px-4 py-2.5 text-sm font-medium border-2 border-amber-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200/50 transition-all duration-300 bg-white/80 placeholder-gray-400",
-                  placeholder: "e.g., Colombian Supreme, Ethiopian Sunrise...",
-                  required: true %>
-              <div class="flex items-center space-x-1.5 text-xs text-gray-500">
-                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span>Give your coffee a memorable name</span>
-              </div>
+    <%# Validation Errors %>
+    <% if @product.errors.any? %>
+      <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 flex gap-3">
+        <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-bold text-red-700 mb-1">
+            <%= pluralize(@product.errors.count, "error") %> prevented this blend from saving:
+          </p>
+          <ul class="text-sm text-red-600 list-disc list-inside space-y-0.5">
+            <% @product.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+    <%# Form %>
+    <%= form_with model: @product, local: true, multipart: true do |form| %>
+      <div class="bg-white/80 backdrop-blur-sm rounded-3xl border border-amber-100 shadow-xl shadow-amber-100/50 overflow-hidden">
+        <%# Coffee Name %>
+        <div class="p-6 border-b border-amber-50">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
+              <span class="text-xs">☕</span>
             </div>
-            <!-- Product Category Field-->
-            <div class="space-y-2 mb-4">
-              <%= form.label :category, class: "block text-base font-bold text-gray-800 mb-1" do %>
-                <div class="flex items-center space-x-2">
-                  <div class="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-                    <span class="text-xs">☕</span>
-                  </div>
-                  <span>Coffee Category</span>
-                </div>
+            <%= form.label :name, class: "text-sm font-bold text-amber-900" do %>
+              Coffee Name <span class="text-red-400">*</span>
+            <% end %>
+          </div>
+          <%= form.text_field :name,
+              id: "product_name",
+              class: "w-full px-4 py-3 text-sm text-amber-900 bg-amber-50/60 border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all placeholder-amber-300 font-medium",
+              placeholder: "e.g., Ethiopian Sunrise, Colombian Supreme..." %>
+          <%# Quick fill %>
+          <div class="mt-3">
+            <p class="text-xs text-amber-500 font-semibold mb-2">✨ Need inspiration?</p>
+            <div class="flex flex-wrap gap-1.5">
+              <% ["Colombian Gold", "Ethiopian Bloom", "Brazilian Santos", "Vanilla Dream", "Caramel Bliss", "Chocolate Velvet"].each do |name| %>
+                <button type="button"
+                  onclick="document.getElementById('product_name').value='<%= name %>'"
+                  class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-700 font-semibold px-3 py-1 rounded-full transition-colors duration-150">
+                  <%= name %>
+                </button>
               <% end %>
-              <select name="product[product_category_id]">
-                <% if @categories.any? %>
-                  <% @categories.each do |category|%>
-                    <option value="<%= category.id %>"><%= category.name %> </option>
+            </div>
+          </div>
+        </div>
+        <%# Category %>
+        <div class="p-6 border-b border-amber-50">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
+              <span class="text-xs">🏷️</span>
+            </div>
+            <label class="text-sm font-bold text-amber-900">
+              Category <span class="text-red-400">*</span>
+            </label>
+          </div>
+          <div class="relative">
+            <select name="product[product_category_id]"
+              class="w-full appearance-none px-4 py-3 text-sm text-amber-900 bg-amber-50/60 border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all font-medium pr-10">
+              <option value="" disabled selected>Select a category...</option>
+              <% if @categories.any? %>
+                <% @categories.each do |category| %>
+                  <option value="<%= category.id %>"
+                    <%= "selected" if @product.product_category_id == category.id %>>
+                    <%= category.name %>
+                  </option>
                   <% end %>
                 <% else %>
-                  <option value="NULL" disabled>No Categories Available </option>
+                  <option disabled>No categories available</option>
                 <% end %>
               </select>
-              <div class="flex items-center space-x-1.5 text-xs text-gray-500">
-                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <div class="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
-                <span>Assign a label to your coffee</span>
               </div>
             </div>
-            <div class="space-y-2 mb-4">
-              <label class="block text-base font-bold text-gray-800">
-                <div class="flex items-center space-x-2 mb-1">
-                  <div class="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-                    <span class="text-xs">🖼️</span>
-                  </div>
-                  <span>Thumbnail</span>
-                </div>
-              </label>
-              <label class="group flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-amber-300 hover:border-amber-500 rounded-xl cursor-pointer bg-amber-50/50 hover:bg-amber-50 transition-all duration-300">
-                <div class="flex flex-col items-center justify-center space-y-1.5 text-center px-4">
-                  <div class="w-8 h-8 bg-gradient-to-r from-amber-400 to-orange-500 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-xs font-bold text-amber-700">Click to upload image</p>
-                    <p class="text-[10px] text-gray-400">PNG, JPG or GIF</p>
-                  </div>
-                </div>
-                <%= form.file_field :thumbnail, accept: "image/png, image/jpeg, image/gif", class: "hidden" %>
-              </label>
-              <% if @product&.thumbnail&.attached? %>
-                <div class="mt-2">
-                  <p class="text-xs text-gray-500 mb-1">Current image</p>
-                  <div class="w-28 h-28 overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-                    <%= image_tag @product.thumbnail,
-                                  class: "object-cover w-full h-full" %>
-                  </div>
-                </div>
-              <% end %>
+          </div>
+          <%# Thumbnail %>
+          <div class="p-6 border-b border-amber-50">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
+                <span class="text-xs">🖼️</span>
+              </div>
+              <label class="text-sm font-bold text-amber-900">Thumbnail</label>
             </div>
-            <div class="space-y-2 mb-4">
-              <label class="block text-base font-bold text-gray-800">
-                <div class="flex items-center space-x-2 mb-1">
-                  <div class="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="text-white size-5" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                    </svg>
-                  </div>
-                  <span>Add Ingredients</span>
+            <% thumbnail_url = (@product.persisted? && @product.thumbnail.attached?) ? url_for(@product.thumbnail) : nil %>
+            <label class="group flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-amber-200 hover:border-amber-400 rounded-2xl cursor-pointer bg-amber-50/40 hover:bg-amber-50 transition-all duration-200">
+              <div class="flex flex-col items-center gap-2">
+                <div class="w-10 h-10 bg-amber-100 group-hover:bg-amber-200 rounded-xl flex items-center justify-center transition-colors duration-200">
+                  <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                  </svg>
                 </div>
-              </label>
+                <div class="text-center">
+                  <p class="text-xs font-bold text-amber-600">Click to upload image</p>
+                  <p id="thumbnail-file-name" class="text-xs text-amber-400">
+                    <%= thumbnail_url.present? ? "Current image loaded — choose a new one to replace" : "PNG, JPG or GIF" %>
+                  </p>
+                </div>
+              </div>
+              <%= form.file_field :thumbnail,
+                id: "product_thumbnail_input",
+                accept: "image/png,image/jpeg,image/gif",
+                class: "hidden" %>
+            </label>
+            <div class="mt-3">
+              <img
+                id="thumbnail_preview"
+                src="<%= thumbnail_url.to_s %>"
+                class="w-full h-44 object-cover rounded-2xl border-2 border-amber-200 shadow-sm <%= thumbnail_url.present? ? '' : 'hidden' %>"
+                alt="Selected thumbnail preview">
+              </div>
+            </div>
+            <%# Ingredients %>
+            <div class="p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
+                  <span class="text-xs">🫘</span>
+                </div>
+                <label class="text-sm font-bold text-amber-900">Ingredients</label>
+              </div>
               <% if @materials.any? %>
-                <div class="my-4">
-                  <select name="materials" id="materials" class="w-120">
-                    <% @materials.each do |material| %>
-                      <option value="<%= material.id %>"><%= material.name %></option>
-                    <% end %>
-                  </select>
-                  <button type="button" id="addIng" class="bg-blue-200 px-4 py-1 text-blue-800 rounded-md font-bold">Add</button>
-                </div>
-              <% end %>
-              <div id="ingDisplay" class=" bg-orange-50 w-auto">
-              </div>
-              <script>
-                var ingList = []; // array for storing the ingredients (objects with id and name)
-
-                // Adding ingredients to the list
-                $('#addIng').on("click", function(){
-                  let selectedId = $('#materials').val();
-                  let selectedName = $('#materials option:selected').text();
-
-                  // Prevent duplicates
-                  if (ingList.some(i => i.id === selectedId)) return;
-
-                  ingList.push({ id: selectedId, name: selectedName });
-
-                  $('#ingDisplay').append(`
-                    <div id="ing-${selectedId}" class="flex gap-2 items-center">
-                      <span>${selectedName}</span>
-                      <button type="button" class="remove-ing text-red-500" data-id="${selectedId}">Remove</button>
+                <div class="flex gap-2 mb-4">
+                  <div class="relative flex-1">
+                    <select id="materials"
+                  class="w-full appearance-none px-4 py-3 text-sm text-amber-900 bg-amber-50/60 border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all font-medium pr-10">
+                      <% @materials.each do |material| %>
+                        <option value="<%= material.id %>"><%= material.name %></option>
+                      <% end %>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+                      <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
                     </div>
-                  `)
-
-                  updateHiddenInputs();
-                });
-
-                // Removing an ingredient
-                $(document).on('click', '.remove-ing', function(){
-                  let id = $(this).data("id").toString();
-
-                  // Remove from array
-                  ingList = ingList.filter(i => i.id !== id);
-
-                  // Remove from display
-                  $(`#ing-${id}`).remove();
-
-                  // Update hidden inputs
-                  updateHiddenInputs();
-                });
-
-                // Updating Form Input
-                function updateHiddenInputs(){
-                  // Remove only dynamically added hidden inputs inside ingDisplay
-                  $("#ingDisplay input[name='myIngredients[]']").remove();
-
-                  ingList.forEach(function(item){
-                    $('<input>').attr({
-                      type:  'hidden',
-                      name:  'myIngredients[]',
-                      value: item.id
-                    }).appendTo('#ingDisplay');
-                  });
-                }
-              </script>
-            </div>
-            <!-- Coffee Inspiration Examples -->
-            <div class="mb-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-100">
-              <h3 class="text-sm font-bold text-amber-800 mb-2 flex items-center space-x-1.5">
-                <span>💡</span>
-                <span>Need Inspiration?</span>
-              </h3>
-              <div class="grid grid-cols-2 gap-2">
-                <div class="space-y-1">
-                  <p class="font-semibold text-amber-700 text-xs">By Origin:</p>
-                  <div class="flex flex-wrap gap-1.5">
-                    <% ['Colombian Gold', 'Ethiopian Bloom', 'Brazilian Santos', 'Guatemalan Antigua'].each do |name| %>
-                      <button type="button" onclick="document.getElementById('product_name').value='<%= name %>'" 
-                              class="text-[11px] bg-amber-200 hover:bg-amber-300 text-amber-800 px-2 py-0.5 rounded-full transition-colors duration-200 cursor-pointer">
-                        <%= name %>
-                      </button>
-                    <% end %>
                   </div>
-                </div>
-                <div class="space-y-1">
-                  <p class="font-semibold text-amber-700 text-xs">By Flavor:</p>
-                  <div class="flex flex-wrap gap-1.5">
-                    <% ['Vanilla Dream', 'Caramel Bliss', 'Chocolate Velvet', 'Nutty Delight'].each do |name| %>
-                      <button type="button" onclick="document.getElementById('product_name').value='<%= name %>'" 
-                              class="text-[11px] bg-orange-200 hover:bg-orange-300 text-orange-800 px-2 py-0.5 rounded-full transition-colors duration-200 cursor-pointer">
-                        <%= name %>
-                      </button>
-                    <% end %>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Error Messages -->
-            <% if @product.errors.any? %>
-              <div class="mb-4 bg-red-50 border border-red-200 rounded-xl p-4">
-                <div class="flex items-center space-x-2 mb-2">
-                  <div class="w-5 h-5 bg-red-500 rounded-lg flex items-center justify-center">
-                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  <button type="button" id="addIng"
+                class="inline-flex items-center gap-1.5 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white text-sm font-bold rounded-2xl transition-all duration-150 shadow-sm shadow-amber-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
                     </svg>
-                  </div>
-                  <h4 class="text-sm font-bold text-red-800">Something went wrong</h4>
+                    Add
+                  </button>
                 </div>
-                <ul class="space-y-1">
-                  <% @product.errors.full_messages.each do |message| %>
-                    <li class="text-xs text-red-700 flex items-center space-x-1.5">
-                      <span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span>
-                      <span><%= message %></span>
-                    </li>
-                  <% end %>
-                </ul>
-              </div>
-            <% end %>
-            <!-- Action Buttons -->
-            <div class="flex space-x-3 pt-2">
-              <%= form.submit "Save Coffee Blend", 
-                  class: "flex-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg text-sm cursor-pointer" %>
-              <%= link_to products_path, 
-                  class: "flex-1 bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-700 font-bold py-2.5 px-5 rounded-xl transition-all duration-300 shadow-sm text-sm text-center" do %>
-                Cancel
               <% end %>
+              <%# Ingredient list %>
+              <div id="ingDisplay" class="space-y-2"></div>
+              <% if @ingredients.any? %>
+                <% @ingredients.each do |ingredient| %>
+                  <%= ingredient.material_name %>
+                <% end %>
+              <% end %>
+              <p id="noIngMsg" class="text-xs text-amber-400 italic font-medium text-center py-4 bg-amber-50/50 rounded-xl border border-dashed border-amber-200">
+                🫘 No ingredients added yet — start building your blend!
+              </p>
             </div>
-          <% end %>
-        </div>
+          </div>
+          <%# Action Buttons %>
+          <div class="flex gap-3 mt-6">
+            <%= form.submit @product.new_record? ? "Save Coffee Blend" : "Update Coffee Blend",
+            class: "flex-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 active:scale-[0.99] text-white font-bold py-3.5 px-6 rounded-2xl transition-all duration-200 text-sm cursor-pointer shadow-lg shadow-amber-200" %>
+            <%= link_to "Cancel", products_path,
+            class: "flex-1 text-center bg-white hover:bg-amber-50 text-amber-700 font-bold py-3.5 px-6 rounded-2xl border-2 border-amber-200 hover:border-amber-300 transition-all duration-200 text-sm" %>
+          </div>
+        <% end %>
       </div>
     </div>
-  </div>
-</div>
+    <style>
+      @keyframes steamRise {
+        0%, 100% { transform: translateY(0) scaleX(1); opacity: 0.7; }
+        50% { transform: translateY(-10px) scaleX(1.1); opacity: 0.2; }
+      }
+      @keyframes floatBean {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-6px) rotate(15deg); }
+      }
+    </style>
+    <script>
+      var ingList = [];
+
+      function renderIngList() {
+        $('#ingDisplay').empty();
+
+        if (ingList.length === 0) {
+          $('#noIngMsg').show();
+          return;
+        }
+
+        $('#noIngMsg').hide();
+
+        ingList.forEach(function(item) {
+          $('#ingDisplay').append(`
+            <div id="ing-${item.id}" class="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl group">
+              <div class="flex items-center gap-2.5">
+                <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500"></div>
+                <span class="text-sm text-amber-800 font-semibold">${item.name}</span>
+              </div>
+              <button type="button" class="remove-ing w-6 h-6 flex items-center justify-center rounded-lg text-amber-300 hover:text-red-400 hover:bg-red-50 transition-all duration-150" data-id="${item.id}">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+              <input type="hidden" name="myIngredients[]" value="${item.id}">
+            </div>
+          `);
+        });
+      }
+
+      $('#addIng').on("click", function() {
+        let id   = $('#materials').val();
+        let name = $('#materials option:selected').text().trim();
+
+        if (ingList.some(i => i.id === id)) return;
+
+        ingList.push({ id, name });
+        renderIngList();
+      });
+
+      $(document).on('click', '.remove-ing', function() {
+        let id = $(this).data("id").toString();
+        ingList = ingList.filter(i => i.id !== id);
+        renderIngList();
+      });
+
+      function bindThumbnailPreview() {
+        $(document).off('change', '#product_thumbnail_input');
+        $(document).on('change', '#product_thumbnail_input', function (e) {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+
+          $('#thumbnail-file-name').text(file.name);
+
+          const reader = new FileReader();
+          reader.onload = function (ev) {
+            $('#thumbnail_preview')
+              .attr('src', ev.target.result)
+              .removeClass('hidden');
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      document.addEventListener('turbo:load', bindThumbnailPreview);
+      $(document).ready(bindThumbnailPreview);
+    </script>
