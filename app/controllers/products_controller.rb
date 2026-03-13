@@ -11,12 +11,11 @@ class ProductsController < ApplicationController
 
   def new
     @product = Product.new
-    load_form_data
+    load_form_data(nil)
   end
 
   def edit
-    load_form_data
-    fetch_ingredients(@product.id)
+    load_form_data(@product.id)
   end
 
   def create
@@ -43,8 +42,8 @@ class ProductsController < ApplicationController
     update_product
   rescue StandardError => e
     Rails.logger.error(e.message)
-    flash.now[:alert] = e.message
-    load_form_data
+    flash.now[:alert] = t('.failure')
+    load_form_data(@product.id)
     render :new, status: :unprocessable_content
   end
 
@@ -73,13 +72,11 @@ class ProductsController < ApplicationController
     params.expect(product: %i[name thumbnail myIngredients product_category_id])
   end
 
-  def load_form_data
+  def load_form_data(product_id)
     @materials = Material.all
     @categories = ProductCategory.all
-  end
-
-  def fetch_ingredients(product_id)
-    @ingredients = Ingredient.joins(:material).where(product_id: product_id)
+    @ingredients = Ingredient.left_joins(:material)
+                             .where(product_id: product_id).select('ingredients.*, materials.*')
   end
 
   def ingredient_ids

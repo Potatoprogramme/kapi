@@ -2,4 +2,5 @@
 
 class ProductCategory < ApplicationRecord
   validates :name, :color, presence: true
+  has_one :
 end

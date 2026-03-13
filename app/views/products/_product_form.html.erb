@@ -161,7 +161,7 @@
                 <div class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
                   <span class="text-xs">🫘</span>
                 </div>
-                <label class="text-sm font-bold text-amber-900">Ingredients</label>
+                <label class="text-sm font-bold text-amber-900">Add Ingredients</label>
               </div>
               <% if @materials.any? %>
                 <div class="flex gap-2 mb-4">
@@ -187,16 +187,25 @@
                   </button>
                 </div>
               <% end %>
-              <%# Ingredient list %>
+              <!-- Ingredients List -->
               <div id="ingDisplay" class="space-y-2"></div>
               <% if @ingredients.any? %>
-                <% @ingredients.each do |ingredient| %>
-                  <%= ingredient.material_name %>
-                <% end %>
+                <div class="mt-4">
+                  <p class="text-xs font-semibold tracking-widest uppercase text-amber-600 mb-3">Ingredients</p>
+                  <div class="space-y-2">
+                    <% @ingredients.each do |ingredient| %>
+                      <div class="flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl">
+                        <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shrink-0"></div>
+                        <span class="text-sm font-semibold text-amber-800"><%= ingredient.material.name %></span>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% else %>
+                <div class="mt-4 text-center py-4 bg-amber-50/50 rounded-xl border border-dashed border-amber-200">
+                  <p class="text-xs text-amber-400 font-medium italic">🫘 No ingredients added yet.</p>
+                </div>
               <% end %>
-              <p id="noIngMsg" class="text-xs text-amber-400 italic font-medium text-center py-4 bg-amber-50/50 rounded-xl border border-dashed border-amber-200">
-                🫘 No ingredients added yet — start building your blend!
-              </p>
             </div>
           </div>
           <%# Action Buttons %>
