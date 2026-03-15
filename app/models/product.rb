@@ -5,4 +5,5 @@ class Product < ApplicationRecord
   has_many :ingredients, dependent: :destroy # on delete: cascade
   has_many :materials, through: :ingredients # join materials
   validates :thumbnail, :name, :product_category_id, presence: true
+  belongs_to :product_category
 end

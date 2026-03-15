@@ -2,5 +2,5 @@
 
 class ProductCategory < ApplicationRecord
   validates :name, :color, presence: true
-  has_one :
+  has_one :product, dependent: :nullify
 end
