@@ -17,7 +17,8 @@ class MaterialsController < ApplicationController
 
   def create
     @material = Material.new(material_params)
-    if @material.save
+    valid_cost = validate_cost_per_unit(@material.cost_per_unit, @material.cost, @material.quantity)
+    if valid_cost && @material.save
       redirect_to materials_path, notice: t('.success')
     else
       render :new, status: :unprocessable_content, notice: t('.failure')
@@ -49,5 +50,12 @@ class MaterialsController < ApplicationController
 
   def set_material
     @material = Material.find(params[:id])
+  end
+
+  def validate_cost_per_unit(received_cost_per_unit, cost, quantity)
+    actual_cost_per_unit = (cost / quantity).to_f.round(3)
+    return unless received_cost_per_unit == actual_cost_per_unit
+
+    true
   end
 end

@@ -31,7 +31,7 @@ RSpec.describe Material, type: :model do
         expect(material).to be_valid
       end
       it 'is valid if cost_per_unit is equal to cost divided by quantity' do
-        expect(material.cost_per_unit).to equal((material.cost / material.quantity).round(2))
+        expect(material.cost_per_unit).to equal((material.cost / material.quantity).round(3))
       end
     end
   end
