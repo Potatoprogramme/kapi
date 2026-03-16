@@ -61,7 +61,7 @@
       </div>
     <% end %>
     <%# Form %>
-    <%= form_with model: @product, local: true, multipart: true do |form| %>
+    <%= form_with model: @product, local: true, data: {turbo: false}, multipart: true do |form| %>
       <div class="bg-white/80 backdrop-blur-sm rounded-3xl border border-amber-100 shadow-xl shadow-amber-100/50 overflow-hidden">
         <%# Coffee Name %>
         <div class="p-6 border-b border-amber-50">
@@ -170,10 +170,11 @@
               <% if @materials.any? %>
                 <div class="flex gap-2 mb-4">
                   <div class="relative flex-1">
+                    <label for="materials">Material </label>
                     <select id="materials"
-                  class="w-full appearance-none px-4 py-3 text-sm text-amber-900 bg-amber-50/60 border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all font-medium pr-10">
+                    class="w-full appearance-none px-4 py-3 text-sm text-amber-900 bg-amber-50/60 border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all font-medium pr-10">
                       <% @materials.each do |material| %>
-                        <option value="<%= material.id %>"><%= material.name %></option>
+                        <option value="<%= material.id %>"data-cost="<%= material.cost_per_unit %>"><%= material.name %> | &#8369;<%= material.cost_per_unit %>/<%= material.unit %></option>
                       <% end %>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-4 flex items-center">
@@ -182,8 +183,12 @@
                       </svg>
                     </div>
                   </div>
+                  <div class="relative flex-1">
+                    <label for="ingredient_quantity">Quantity </label>
+                    <input type="number" min="0" step="0.01" id="ingredient_quantity" class="w-full px-4 py-3 border border-amber-200 rounded-2xl">
+                  </div>
                   <button type="button" id="addIng"
-                class="inline-flex items-center gap-1.5 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white text-sm font-bold rounded-2xl transition-all duration-150 shadow-sm shadow-amber-200">
+                    class="inline-flex items-center gap-1.5 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white text-sm font-bold rounded-2xl transition-all duration-150 shadow-sm shadow-amber-200">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -193,6 +198,10 @@
               <% end %>
               <!-- Ingredients List -->
               <div id="ingDisplay" class="space-y-2"></div>
+              <div class="mt-4 flex items-center justify-end">
+                <span class="text-sm font-bold text-amber-900 mr-2">Direct Cost:</span>
+                <span id="directCost" class="text-lg font-bold text-orange-700">&#8369;0.00</span>
+              </div>
             </div>
           </div>
           <%# Action Buttons %>
@@ -216,80 +225,94 @@
       }
     </style>
     <script>
-      var existingIngredients = <%= @ingredients.map { |i| { id: i.material_id.to_s, name: i.material.name } }.to_json.html_safe %>;
+      var existingIngredients = <%= @ingredients.map { |i| { id: i.material_id.to_s, name: i.material.name, quantity: i.quantity, cost_per_unit: i.material.cost_per_unit } }.to_json.html_safe %>;
       var ingList = [];
-
-      // Pre-populate with existing ingredients on load
-      function initIngredients() {
-        ingList = existingIngredients || [];
-        renderIngList();
-        filterMaterialsSelect();
-      }
-
-      function filterMaterialsSelect() {
-        var addedIds = ingList.map(i => i.id);
-        $('#materials option').each(function() {
-          if (addedIds.includes($(this).val())) {
-      $(this).hide().prop('disabled', true);
-          } else {
-      $(this).show().prop('disabled', false);
-          }
-        });
-
-        // Reset select to first available option
-        var firstAvailable = $('#materials option:not(:disabled)').first().val();
-        $('#materials').val(firstAvailable);
-      }
 
       function renderIngList() {
         $('#ingDisplay').empty();
 
         if (ingList.length === 0) {
           $('#ingDisplay').append(`
-      <div id="noIngMsg" class="mt-2 text-center py-4 bg-amber-50/50 rounded-xl border border-dashed border-amber-200">
-        <p class="text-xs text-amber-400 font-medium italic">🫘 No ingredients added yet.</p>
-      </div>
+          <div id="noIngMsg" class="mt-2 text-center py-4 bg-amber-50/50 rounded-xl border border-dashed border-amber-200">
+            <p class="text-xs text-amber-400 font-medium italic">🫘 No ingredients added yet.</p>
+          </div>
           `);
+          updateTotalCost();
           return;
         }
 
-        ingList.forEach(function(item) {
+        ingList.forEach(function(item, idx) {
           $('#ingDisplay').append(`
-      <div id="ing-${item.id}" class="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl group">
-        <div class="flex items-center gap-2.5">
-          <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500"></div>
-          <span class="text-sm text-amber-800 font-semibold">${item.name}</span>
-        </div>
-        <button type="button" class="remove-ing w-6 h-6 flex items-center justify-center rounded-lg text-amber-300 hover:text-red-400 hover:bg-red-50 transition-all duration-150" data-id="${item.id}">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-        <input type="hidden" name="myIngredients[]" value="${item.id}">
-      </div>
+          <div id="ing-${item.id}" class="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl group">
+            <div class="flex items-center gap-2.5">
+              <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500"></div>
+              <span class="text-sm text-amber-800 font-semibold">${item.name}</span>
+              <span class="text-xs text-amber-500 ml-2">Qty: ${item.quantity}</span>
+              <span class="text-xs text-orange-700 ml-2">Cost: &#8369;${(item.cost_per_unit * item.quantity).toFixed(3)}</span>
+            </div>
+            <button type="button" class="remove-ing w-6 h-6 flex items-center justify-center rounded-lg text-amber-300 hover:text-red-400 hover:bg-red-50 transition-all duration-150" data-id="${item.id}">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+            <input type="hidden" name="product[ingredients][${idx}][id]" value="${item.id}">
+            <input type="hidden" name="product[ingredients][${idx}][costPerUnit]" value="${item.cost_per_unit}">
+            <input type="hidden" name="product[ingredients][${idx}][quantity]" value="${item.quantity}">
+          </div>
           `);
         });
+        updateTotalCost();
+      }
+
+      function updateTotalCost() {
+        var total = ingList.reduce(function(sum, item) {
+          return sum + (parseFloat(item.cost_per_unit) * parseFloat(item.quantity));
+        }, 0);
+        $('#directCost').text('₱' + total.toFixed(2));
       }
 
       $('#addIng').on("click", function() {
-        let id   = $('#materials').val();
+        let id = $('#materials').val();
         let name = $('#materials option:selected').text().trim();
+        let quantity = $('#ingredient_quantity').val();
+        let cost_per_unit = $('#materials option:selected').data('cost');
 
-        if (!id || ingList.some(i => i.id === id)) return;
+        if (!id || ingList.some(i => i.id === id) || !quantity || quantity <= 0) return;
 
-        ingList.push({ id, name });
+        ingList.push({ id, name, quantity, cost_per_unit });
         renderIngList();
-        filterMaterialsSelect();  // ← hide the added item from select
+        filterMaterialsSelect();
+        $('#ingredient_quantity').val(''); // reset quantity input
       });
 
       $(document).on('click', '.remove-ing', function() {
         let id = $(this).data("id").toString();
         ingList = ingList.filter(i => i.id !== id);
         renderIngList();
-        filterMaterialsSelect();  // ← show the removed item back in select
+        filterMaterialsSelect();
       });
 
-      // Init on page load
+      function filterMaterialsSelect() {
+        var addedIds = ingList.map(i => i.id);
+        $('#materials option').each(function() {
+          if (addedIds.includes($(this).val())) {
+            $(this).hide().prop('disabled', true);
+          } else {
+            $(this).show().prop('disabled', false);
+          }
+        });
+        var firstAvailable = $('#materials option:not(:disabled)').first().val();
+        $('#materials').val(firstAvailable);
+      }
+
+      function initIngredients() {
+        ingList = existingIngredients || [];
+        renderIngList();
+        filterMaterialsSelect();
+      }
+
       document.addEventListener('turbo:load', initIngredients);
       $(document).ready(initIngredients);
     </script>
+  </div>
+</div>

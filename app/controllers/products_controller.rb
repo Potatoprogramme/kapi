@@ -25,14 +25,14 @@ class ProductsController < ApplicationController
     load_form_data(nil)
     @product.errors.add(:ingredients, 'cannot be empty') unless params.key?(:myIngredients)
     flash.now[:alert] = e.message
-    render :new, status: :unprocessable_content
+    render json: params, status: :unprocessable_content
   end
 
   def insert_product
     @product = Product.new(product_params)
     ActiveRecord::Base.transaction do
       @product.save!
-      ingredient_ids.each do |material_id|
+      recipe_ids.each do |material_id|
         Ingredient.create!(product_id: @product.id, material_id: material_id)
       end
     end
@@ -45,14 +45,14 @@ class ProductsController < ApplicationController
     @product.errors.add(:ingredients, 'cannot be empty')
     flash.now[:alert] = e.message
     load_form_data(@product.id)
-    render :new, status: :unprocessable_content
+    render json: params, status: :unprocessable_content
   end
 
   def update_product
     ActiveRecord::Base.transaction do
       @product.update(product_params)
       Ingredient.where(product_id: @product.id).delete_all
-      ingredient_ids.each do |material_id|
+      recipe_ids.each do |material_id|
         Ingredient.create!(product_id: @product.id, material_id: material_id)
       end
     end
@@ -80,7 +80,7 @@ class ProductsController < ApplicationController
                              .where(product_id: product_id).select('ingredients.*, materials.*')
   end
 
-  def ingredient_ids
-    params.expect(myIngredients: [])
+  def recipe_ids
+    params.expect(product:)
   end
 end

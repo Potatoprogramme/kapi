@@ -2,8 +2,8 @@
 
 class Product < ApplicationRecord
   has_one_attached :thumbnail
-  has_many :ingredients, dependent: :destroy # on delete: cascade
-  has_many :materials, through: :ingredients # join materials
+  has_many :recipe, dependent: :destroy # on delete: cascade
+  has_many :materials, through: :recipe # join materials
   validates :thumbnail, :name, presence: true
   belongs_to :product_category
 end
