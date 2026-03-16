@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_13_031629) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_15_062440) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -53,7 +53,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_13_031629) do
 
   create_table "materials", force: :cascade do |t|
     t.float "cost"
-    t.float "cost_per_unit"
+    t.virtual "cost_per_unit", type: :decimal, precision: 12, scale: 4, as: "(cost / NULLIF(quantity, (0)::double precision))", stored: true
     t.datetime "created_at", null: false
     t.string "name"
     t.float "quantity"

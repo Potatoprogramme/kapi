@@ -38,6 +38,10 @@
     </div>
     <%# Validation Errors %>
     <% if @product.errors.any? %>
+      <script>
+        // Log the submitted params if there are errors
+        console.error("Submitted params:", <%= params.to_json.html_safe %>);
+      </script>
       <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 flex gap-3">
         <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
           <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,23 +193,6 @@
               <% end %>
               <!-- Ingredients List -->
               <div id="ingDisplay" class="space-y-2"></div>
-              <% if @ingredients.any? %>
-                <div class="mt-4">
-                  <p class="text-xs font-semibold tracking-widest uppercase text-amber-600 mb-3">Ingredients</p>
-                  <div class="space-y-2">
-                    <% @ingredients.each do |ingredient| %>
-                      <div class="flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl">
-                        <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shrink-0"></div>
-                        <span class="text-sm font-semibold text-amber-800"><%= ingredient.material.name %></span>
-                      </div>
-                    <% end %>
-                  </div>
-                </div>
-              <% else %>
-                <div class="mt-4 text-center py-4 bg-amber-50/50 rounded-xl border border-dashed border-amber-200">
-                  <p class="text-xs text-amber-400 font-medium italic">🫘 No ingredients added yet.</p>
-                </div>
-              <% end %>
             </div>
           </div>
           <%# Action Buttons %>
@@ -229,32 +216,57 @@
       }
     </style>
     <script>
+      var existingIngredients = <%= @ingredients.map { |i| { id: i.material_id.to_s, name: i.material.name } }.to_json.html_safe %>;
       var ingList = [];
+
+      // Pre-populate with existing ingredients on load
+      function initIngredients() {
+        ingList = existingIngredients || [];
+        renderIngList();
+        filterMaterialsSelect();
+      }
+
+      function filterMaterialsSelect() {
+        var addedIds = ingList.map(i => i.id);
+        $('#materials option').each(function() {
+          if (addedIds.includes($(this).val())) {
+      $(this).hide().prop('disabled', true);
+          } else {
+      $(this).show().prop('disabled', false);
+          }
+        });
+
+        // Reset select to first available option
+        var firstAvailable = $('#materials option:not(:disabled)').first().val();
+        $('#materials').val(firstAvailable);
+      }
 
       function renderIngList() {
         $('#ingDisplay').empty();
 
         if (ingList.length === 0) {
-          $('#noIngMsg').show();
+          $('#ingDisplay').append(`
+      <div id="noIngMsg" class="mt-2 text-center py-4 bg-amber-50/50 rounded-xl border border-dashed border-amber-200">
+        <p class="text-xs text-amber-400 font-medium italic">🫘 No ingredients added yet.</p>
+      </div>
+          `);
           return;
         }
 
-        $('#noIngMsg').hide();
-
         ingList.forEach(function(item) {
           $('#ingDisplay').append(`
-            <div id="ing-${item.id}" class="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl group">
-              <div class="flex items-center gap-2.5">
-                <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500"></div>
-                <span class="text-sm text-amber-800 font-semibold">${item.name}</span>
-              </div>
-              <button type="button" class="remove-ing w-6 h-6 flex items-center justify-center rounded-lg text-amber-300 hover:text-red-400 hover:bg-red-50 transition-all duration-150" data-id="${item.id}">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-              </button>
-              <input type="hidden" name="myIngredients[]" value="${item.id}">
-            </div>
+      <div id="ing-${item.id}" class="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl group">
+        <div class="flex items-center gap-2.5">
+          <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500"></div>
+          <span class="text-sm text-amber-800 font-semibold">${item.name}</span>
+        </div>
+        <button type="button" class="remove-ing w-6 h-6 flex items-center justify-center rounded-lg text-amber-300 hover:text-red-400 hover:bg-red-50 transition-all duration-150" data-id="${item.id}">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+        <input type="hidden" name="myIngredients[]" value="${item.id}">
+      </div>
           `);
         });
       }
@@ -263,36 +275,21 @@
         let id   = $('#materials').val();
         let name = $('#materials option:selected').text().trim();
 
-        if (ingList.some(i => i.id === id)) return;
+        if (!id || ingList.some(i => i.id === id)) return;
 
         ingList.push({ id, name });
         renderIngList();
+        filterMaterialsSelect();  // ← hide the added item from select
       });
 
       $(document).on('click', '.remove-ing', function() {
         let id = $(this).data("id").toString();
         ingList = ingList.filter(i => i.id !== id);
         renderIngList();
+        filterMaterialsSelect();  // ← show the removed item back in select
       });
 
-      function bindThumbnailPreview() {
-        $(document).off('change', '#product_thumbnail_input');
-        $(document).on('change', '#product_thumbnail_input', function (e) {
-          const file = e.target.files && e.target.files[0];
-          if (!file) return;
-
-          $('#thumbnail-file-name').text(file.name);
-
-          const reader = new FileReader();
-          reader.onload = function (ev) {
-            $('#thumbnail_preview')
-              .attr('src', ev.target.result)
-              .removeClass('hidden');
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      document.addEventListener('turbo:load', bindThumbnailPreview);
-      $(document).ready(bindThumbnailPreview);
+      // Init on page load
+      document.addEventListener('turbo:load', initIngredients);
+      $(document).ready(initIngredients);
     </script>

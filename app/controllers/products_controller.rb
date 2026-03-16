@@ -22,9 +22,9 @@ class ProductsController < ApplicationController
     insert_product
     redirect_to products_path, notice: t('.success')
   rescue StandardError => e
-    load_form_data
-    Rails.logger.error(e.message)
-    flash.now[:alert] = t('.failure')
+    load_form_data(nil)
+    @product.errors.add(:ingredients, 'cannot be empty') unless params.key?(:myIngredients)
+    flash.now[:alert] = e.message
     render :new, status: :unprocessable_content
   end
 
@@ -40,15 +40,16 @@ class ProductsController < ApplicationController
 
   def update
     update_product
+    redirect_to products_path, notice: t('.success')
   rescue StandardError => e
-    Rails.logger.error(e.message)
-    flash.now[:alert] = t('.failure')
+    @product.errors.add(:ingredients, 'cannot be empty')
+    flash.now[:alert] = e.message
     load_form_data(@product.id)
     render :new, status: :unprocessable_content
   end
 
   def update_product
-    AcitveRecord::Base.transaction do
+    ActiveRecord::Base.transaction do
       @product.update(product_params)
       Ingredient.where(product_id: @product.id).delete_all
       ingredient_ids.each do |material_id|
@@ -69,7 +70,7 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.expect(product: %i[name thumbnail myIngredients product_category_id])
+    params.expect(product: %i[name thumbnail product_category_id])
   end
 
   def load_form_data(product_id)
