@@ -38,7 +38,7 @@ class ProductsController < ApplicationController
 
   def insert_ingredient
     ingredient_params.each do |material|
-      Ingredient.create!(product_id: @product.id, material_id: material.id)
+      Ingredient.create!(product_id: @product.id, material_id: material['id'])
     end
   end
 
@@ -55,10 +55,7 @@ class ProductsController < ApplicationController
   def update_product
     ActiveRecord::Base.transaction do
       @product.update(product_params)
-      Ingredient.where(product_id: @product.id).delete_all
-      recipe_ids.each do |material_id|
-        Ingredient.create!(product_id: @product.id, material_id: material_id)
-      end
+      insert_ingredient
     end
   end
 
