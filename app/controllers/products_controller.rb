@@ -11,7 +11,7 @@ class ProductsController < ApplicationController
 
   def new
     @product = Product.new
-    load_form_data(nil)
+    load_form_data
   end
 
   def edit
@@ -22,7 +22,7 @@ class ProductsController < ApplicationController
     insert_product
     redirect_to products_path, notice: t('.success')
   rescue StandardError => e
-    load_form_data(nil)
+    load_form_data
     @product.errors.add(:ingredients, 'cannot be empty') unless params[:product].key?(:ingredients)
     flash.now[:alert] = e.message
     render :new, status: :unprocessable_content
@@ -32,13 +32,17 @@ class ProductsController < ApplicationController
     @product = Product.new(product_params)
     ActiveRecord::Base.transaction do
       @product.save!
-      insert_ingredient
+      insert_ingredient('create')
     end
   end
 
-  def insert_ingredient
-    ingredient_params.each do |material|
-      Ingredient.create!(product_id: @product.id, material_id: material['id'])
+  def insert_ingredient(method = nil)
+    if method == 'update'
+      Ingredient.where(product_id: @product.id).destroy
+    elsif method == 'create'
+      ingredient_params.each do |material|
+        Ingredient.create!(product_id: @product.id, material_id: material['id'])
+      end
     end
   end
 
@@ -55,7 +59,6 @@ class ProductsController < ApplicationController
   def update_product
     ActiveRecord::Base.transaction do
       @product.update(product_params)
-      insert_ingredient
     end
   end
 
@@ -74,7 +77,7 @@ class ProductsController < ApplicationController
     params.expect(product: %i[name thumbnail product_category_id])
   end
 
-  def load_form_data(product_id)
+  def load_form_data(product_id = nil)
     @materials = Material.all
     @categories = ProductCategory.all
     @ingredients = Ingredient.left_joins(:material)
