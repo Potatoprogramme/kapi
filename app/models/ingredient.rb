@@ -3,4 +3,5 @@
 class Ingredient < ApplicationRecord
   belongs_to :material
   belongs_to :product
+  has_one :ingredient_costing, dependent: :destroy
 end
