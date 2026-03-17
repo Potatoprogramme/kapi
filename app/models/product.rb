@@ -6,4 +6,5 @@ class Product < ApplicationRecord
   has_many :materials, through: :ingredient # join materials
   validates :thumbnail, :name, presence: true
   belongs_to :product_category
+  enum :status, { deleted: 0, active: 1, inactive: 2 }, default: :active
 end
