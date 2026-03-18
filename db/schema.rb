@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 20_260_317_035_810) do
+ActiveRecord::Schema[8.1].define(version: 20_260_318_023_755) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'pg_catalog.plpgsql'
 
@@ -80,10 +80,25 @@ ActiveRecord::Schema[8.1].define(version: 20_260_317_035_810) do
     t.datetime 'updated_at', null: false
   end
 
+  create_table 'product_costings', force: :cascade do |t|
+    t.datetime 'created_at', null: false
+    t.decimal 'direct_cost'
+    t.decimal 'overhead_cost'
+    t.decimal 'overhead_percentage'
+    t.bigint 'product_id', null: false
+    t.decimal 'profit_margin_amount'
+    t.decimal 'profit_margin_percentage'
+    t.decimal 'selling_price'
+    t.decimal 'total_cost'
+    t.datetime 'updated_at', null: false
+    t.index ['product_id'], name: 'index_product_costings_on_product_id'
+  end
+
   create_table 'products', force: :cascade do |t|
     t.datetime 'created_at', null: false
     t.string 'name'
     t.bigint 'product_category_id'
+    t.integer 'status', default: 1, null: false
     t.datetime 'updated_at', null: false
     t.index ['product_category_id'], name: 'index_products_on_product_category_id'
   end
@@ -110,6 +125,7 @@ ActiveRecord::Schema[8.1].define(version: 20_260_317_035_810) do
   add_foreign_key 'ingredient_costings', 'ingredients'
   add_foreign_key 'ingredients', 'materials'
   add_foreign_key 'ingredients', 'products'
+  add_foreign_key 'product_costings', 'products'
   add_foreign_key 'products', 'product_categories', on_delete: :nullify
   add_foreign_key 'sessions', 'users'
 end
