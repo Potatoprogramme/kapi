@@ -11,21 +11,17 @@
     </div>
     <%# Page Header %>
     <div class="text-center mb-10">
-      <%# Cup with steam %>
       <div class="relative inline-block mb-5">
-        <%# Steam lines %>
         <div class="absolute -top-5 left-1/2 -translate-x-1/2 flex gap-1.5">
-          <div class="w-1 h-6 bg-amber-300/70 rounded-full" style="animation: steamRise 2s ease-in-out infinite; animation-delay: 0s;"></div>
+          <div class="w-1 h-6 bg-amber-300/70 rounded-full" style="animation: steamRise 2s ease-in-out infinite;"></div>
           <div class="w-1 h-8 bg-orange-300/70 rounded-full" style="animation: steamRise 2s ease-in-out infinite; animation-delay: 0.4s;"></div>
           <div class="w-1 h-5 bg-amber-300/70 rounded-full" style="animation: steamRise 2s ease-in-out infinite; animation-delay: 0.8s;"></div>
         </div>
-        <%# Coffee cup icon %>
         <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-200">
           <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
             <span class="text-3xl">☕</span>
           </div>
         </div>
-        <%# Floating beans %>
         <div class="absolute -top-1 -right-2 w-3 h-4 bg-amber-800 rounded-full" style="animation: floatBean 3s ease-in-out infinite;"></div>
         <div class="absolute -bottom-1 -left-2 w-2.5 h-3 bg-amber-900 rounded-full" style="animation: floatBean 3s ease-in-out infinite; animation-delay: 1.5s;"></div>
       </div>
@@ -38,10 +34,6 @@
     </div>
     <%# Validation Errors %>
     <% if @product.errors.any? %>
-      <script>
-        // Log the submitted params if there are errors
-        console.error("Submitted params:", <%= params.to_json.html_safe %>);
-      </script>
       <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 flex gap-3">
         <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
           <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,7 +69,6 @@
               id: "product_name",
               class: "w-full px-4 py-3 text-sm text-amber-900 bg-amber-50/60 border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all placeholder-amber-300 font-medium",
               placeholder: "e.g., Ethiopian Sunrise, Colombian Supreme..." %>
-          <%# Quick fill %>
           <div class="mt-3">
             <p class="text-xs text-amber-500 font-semibold mb-2">✨ Need inspiration?</p>
             <div class="flex flex-wrap gap-1.5">
@@ -107,8 +98,7 @@
               <option value="" disabled selected>Select a category...</option>
               <% if @categories.any? %>
                 <% @categories.each do |category| %>
-                  <option value="<%= category.id %>"
-                    <%= "selected" if @product.product_category_id == category.id %>>
+                  <option value="<%= category.id %>" <%= "selected" if @product.product_category_id == category.id %>>
                     <%= category.name %>
                   </option>
                   <% end %>
@@ -146,180 +136,353 @@
                   </p>
                 </div>
               </div>
-              <%= form.file_field :thumbnail,
-                id: "product_thumbnail_input",
-                accept: "image/png,image/jpeg,image/gif",
-                class: "hidden" %>
+              <%= form.file_field :thumbnail, id: "product_thumbnail_input", accept: "image/png,image/jpeg,image/gif", class: "hidden" %>
             </label>
             <div class="mt-3">
-              <img
-                id="thumbnail_preview"
-                src="<%= thumbnail_url.to_s %>"
-                class="w-full h-44 object-cover rounded-2xl border-2 border-amber-200 shadow-sm <%= thumbnail_url.present? ? '' : 'hidden' %>"
-                alt="Selected thumbnail preview">
-              </div>
+              <img id="thumbnail_preview" src="<%= thumbnail_url.to_s %>"
+              class="w-full h-44 object-cover rounded-2xl border-2 border-amber-200 shadow-sm <%= thumbnail_url.present? ? '' : 'hidden' %>"
+              alt="Thumbnail preview">
             </div>
-            <%# Ingredients %>
-            <div class="p-6">
-              <div class="flex items-center gap-2 mb-3">
-                <div class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
-                  <span class="text-xs">🫘</span>
-                </div>
-                <label class="text-sm font-bold text-amber-900">Add Ingredients</label>
+          </div>
+          <%# Ingredients %>
+          <div class="p-6 border-b border-amber-50">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
+                <span class="text-xs">🫘</span>
               </div>
-              <% if @materials.any? %>
-                <div class="flex gap-2 mb-4">
-                  <div class="relative flex-1">
-                    <label for="materials">Material </label>
+              <label class="text-sm font-bold text-amber-900">Ingredients</label>
+            </div>
+            <% if @materials.any? %>
+              <div class="flex gap-2 mb-4 items-end">
+                <div class="flex-1">
+                  <label class="block text-xs font-semibold text-amber-700 mb-1.5">Material</label>
+                  <div class="relative">
                     <select id="materials"
-                    class="w-full appearance-none px-4 py-3 text-sm text-amber-900 bg-amber-50/60 border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all font-medium pr-10">
+                    class="w-full appearance-none px-4 py-2.5 text-sm text-amber-900 bg-amber-50/60 border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all font-medium pr-8">
                       <% @materials.each do |material| %>
-                        <option value="<%= material.id %>" data-cost="<%= material.cost_per_unit %>" data-unit="<%= material.unit %>"><%= material.name %> | &#8369;<%= material.cost_per_unit %>/<%= material.unit %></option>
+                        <option value="<%= material.id %>"
+                        data-cost="<%= material.cost_per_unit %>"
+                        data-unit="<%= material.unit %>">
+                          <%= material.name %> | ₱<%= material.cost_per_unit %>/<%= material.unit %>
+                        </option>
                       <% end %>
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-4 flex items-center">
-                      <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                      <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                       </svg>
                     </div>
                   </div>
-                  <div class="relative flex-1">
-                    <label for="ingredient_quantity">Quantity </label>
-                    <input type="number" min="0" step="0.01" id="ingredient_quantity" class="w-full px-4 py-3 border border-amber-200 rounded-2xl">
-                  </div>
-                  <button type="button" id="addIng"
-                    class="inline-flex items-center gap-1.5 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white text-sm font-bold rounded-2xl transition-all duration-150 shadow-sm shadow-amber-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Add
-                  </button>
                 </div>
-              <% end %>
-              <!-- Ingredients List -->
-              <div id="ingDisplay" class="space-y-2"></div>
-              <div class="mt-4 flex items-center justify-end">
-                <span class="text-sm font-bold text-amber-900 mr-2">Direct Cost:</span>
-                <span id="directCost" class="text-lg font-bold text-orange-700">&#8369;0.00</span>
+                <div class="w-28">
+                  <label class="block text-xs font-semibold text-amber-700 mb-1.5">Quantity</label>
+                  <input type="number" min="0" step="0.01" id="ingredient_quantity" placeholder="0.00"
+                  class="w-full px-3 py-2.5 text-sm text-amber-900 bg-amber-50/60 border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all font-medium placeholder-amber-300">
+                </div>
+                <button type="button" id="addIng"
+                class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white text-sm font-bold rounded-2xl transition-all duration-150 shadow-sm shadow-amber-200">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                  </svg>
+                  Add
+                </button>
+              </div>
+            <% end %>
+            <div id="ingDisplay" class="space-y-2"></div>
+          </div>
+          <%# Costing Section %>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-5">
+              <div class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
+                <span class="text-xs">💰</span>
+              </div>
+              <label class="text-sm font-bold text-amber-900">Product Costing</label>
+            </div>
+            <%# Costing breakdown card %>
+            <div class="bg-amber-50/60 border border-amber-200 rounded-2xl overflow-hidden">
+              <%# Direct Cost row — driven by ingredients %>
+              <div class="flex items-center justify-between px-5 py-4 border-b border-amber-100">
+                <div>
+                  <p class="text-sm font-bold text-amber-900">Direct Cost</p>
+                  <p class="text-xs text-amber-500 mt-0.5">Sum of all ingredient costs</p>
+                </div>
+                <span id="display_direct_cost" class="text-base font-black text-amber-800">₱0.00</span>
+              </div>
+              <%# Overhead %>
+              <div class="flex items-center justify-between px-5 py-4 border-b border-amber-100">
+                <div class="flex-1 mr-6">
+                  <label for="overhead_percentage" class="text-sm font-bold text-amber-900">Overhead</label>
+                  <p class="text-xs text-amber-500 mt-0.5">Utilities, rent, labor, etc.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="relative w-28">
+                    <input type="number" id="overhead_percentage" name="product[overhead_percentage]"
+                    value="<%= @product_costing.overhead_percentage if @product_costing.present? %>"
+                    min="0" step="0.01" placeholder="0"
+                    class="w-full pl-3 pr-8 py-2 text-sm text-amber-900 bg-white border border-amber-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-right">
+                    <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-bold text-amber-400">%</span>
+                  </div>
+                  <span id="display_overhead_cost" class="text-sm font-bold text-amber-700 w-20 text-right">₱0.00</span>
+                </div>
+              </div>
+              <%# Total Cost row %>
+              <div class="flex items-center justify-between px-5 py-4 border-b border-amber-200 bg-amber-100/60">
+                <div>
+                  <p class="text-sm font-bold text-amber-900">Total Cost</p>
+                  <p class="text-xs text-amber-500 mt-0.5">Direct Cost + Overhead</p>
+                </div>
+                <span id="display_total_cost" class="text-base font-black text-orange-700">₱0.00</span>
+              </div>
+              <%# Profit Margin %>
+              <div class="flex items-center justify-between px-5 py-4 border-b border-amber-100">
+                <div class="flex-1 mr-6">
+                  <label for="profit_margin_percentage" class="text-sm font-bold text-amber-900">Profit Margin</label>
+                  <p class="text-xs text-amber-500 mt-0.5">Desired margin on selling price</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="relative w-28">
+                    <input type="number" id="profit_margin_percentage" name="product[profit_margin_percentage]"
+                    value="<%= @product_costing.profit_margin_percentage if @product_costing.present? %>"
+                    min="0" max="99" step="0.01" placeholder="0"
+                    class="w-full pl-3 pr-8 py-2 text-sm text-amber-900 bg-white border border-amber-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-right">
+                    <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-bold text-amber-400">%</span>
+                  </div>
+                  <script>
+                    $('#profit_margin_percentage').on('input', function() {
+                      let val = parseFloat(this.value);
+                      if (val > 99) {
+                        this.value = 99;
+                      } else if (val < 0) {
+                        this.value = 0;
+                      }
+                      calcCosting();
+                    });
+                  </script>
+                  <span id="display_margin_amount" class="text-sm font-bold text-amber-700 w-20 text-right">₱0.00</span>
+                </div>
+              </div>
+              <%# Recommended Price — highlighted %>
+              <div class="flex items-center justify-between px-5 py-5 bg-gradient-to-r from-amber-400/20 to-orange-400/20">
+                <div>
+                  <p class="text-sm font-black text-amber-900">Recommended Price</p>
+                  <p class="text-xs text-amber-600 mt-0.5">Total Cost ÷ (1 − Margin%)</p>
+                </div>
+                <span id="display_recommended_price" class="text-2xl font-black text-orange-600">₱0.00</span>
+              </div>
+              <%# Final Selling Price %>
+              <div class="flex items-center justify-between px-5 py-4 border-t-2 border-amber-300">
+                <div class="flex-1 mr-6">
+                  <label for="selling_price" class="text-sm font-black text-amber-900">Final Selling Price</label>
+                  <p class="text-xs text-amber-500 mt-0.5">Set your actual selling price</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="relative w-36">
+                    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs font-bold text-amber-500">₱</span>
+                    <input type="number" id="selling_price" name="product[selling_price]"
+        value="<%= @product_costing.selling_price if @product_costing.present? %>"
+        min="0" step="0.01" placeholder="0.00"
+        class="w-full pl-7 pr-3 py-2 text-sm text-amber-900 bg-white border-2 border-amber-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-black text-right">
+                  </div>
+                </div>
+              </div>
+              <%# Profit display — updates based on final selling price vs total cost %>
+              <div id="profit_display" class="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-t border-amber-100">
+                <p class="text-xs font-semibold text-gray-500">Actual Profit Margin</p>
+                <div class="flex items-center gap-2">
+                  <span id="display_actual_margin_pct" class="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-lg">0.00%</span>
+                  <span id="display_actual_profit" class="text-sm font-black text-green-700">₱0.00</span>
+                </div>
               </div>
             </div>
+            <%# Hidden fields to persist costing values %>
+            <input type="hidden" id="direct_cost_field"         name="product[direct_cost]"               value="0">
+            <input type="hidden" id="overhead_cost_field"       name="product[overhead_cost]"             value="0">
+            <input type="hidden" id="total_cost_field"          name="product[total_cost]"                value="0">
+            <input type="hidden" id="profit_margin_cost_field"  name="product[profit_margin_amount]"      value="0">
           </div>
-          <%# Action Buttons %>
-          <div class="flex gap-3 mt-6">
-            <%= form.submit @product.new_record? ? "Save Coffee Blend" : "Update Coffee Blend",
+        </div>
+        <%# Action Buttons %>
+        <div class="flex gap-3 mt-6">
+          <%= form.submit @product.new_record? ? "Save Coffee Blend" : "Update Coffee Blend",
             class: "flex-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 active:scale-[0.99] text-white font-bold py-3.5 px-6 rounded-2xl transition-all duration-200 text-sm cursor-pointer shadow-lg shadow-amber-200" %>
-            <%= link_to "Cancel", products_path,
+          <%= link_to "Cancel", products_path,
             class: "flex-1 text-center bg-white hover:bg-amber-50 text-amber-700 font-bold py-3.5 px-6 rounded-2xl border-2 border-amber-200 hover:border-amber-300 transition-all duration-200 text-sm" %>
-          </div>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
     </div>
-    <style>
-      @keyframes steamRise {
-        0%, 100% { transform: translateY(0) scaleX(1); opacity: 0.7; }
-        50% { transform: translateY(-10px) scaleX(1.1); opacity: 0.2; }
-      }
-      @keyframes floatBean {
-        0%, 100% { transform: translateY(0) rotate(0deg); }
-        50% { transform: translateY(-6px) rotate(15deg); }
-      }
-    </style>
-    <script>
-      var existingIngredients = <%= @ingredients.map { |i| {
-        id: i.material_id.to_s,
-        name: i.material.name,
-        quantity: i.quantity,
-        cost_per_unit: i.material.cost_per_unit,
-        unit: i.material.unit # <-- add this line
-      } }.to_json.html_safe %>;
-       var ingList = [];
-
-       function renderIngList() {
-         $('#ingDisplay').empty();
-
-         if (ingList.length === 0) {
-           $('#ingDisplay').append(`
-           <div id="noIngMsg" class="mt-2 text-center py-4 bg-amber-50/50 rounded-xl border border-dashed border-amber-200">
-             <p class="text-xs text-amber-400 font-medium italic">🫘 No ingredients added yet.</p>
-           </div>
-           `);
-           updateTotalCost();
-           return;
-         }
-
-         ingList.forEach(function(item, idx) {
-           $('#ingDisplay').append(`
-           <div id="ing-${item.id}" class="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl group">
-             <div class="flex items-center gap-2.5">
-               <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500"></div>
-               <span class="text-sm text-amber-800 font-semibold">${item.name}</span>
-               <span class="text-xs text-amber-500 ml-2">Qty: ${item.quantity} ${item.unit}</span>
-               <span class="text-xs text-orange-700 ml-2">Cost: &#8369;${(item.cost_per_unit * item.quantity).toFixed(3)}</span>
-             </div>
-             <button type="button" class="remove-ing w-6 h-6 flex items-center justify-center rounded-lg text-amber-300 hover:text-red-400 hover:bg-red-50 transition-all duration-150" data-id="${item.id}">
-               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-               </svg>
-             </button>
-             <input type="hidden" name="product[ingredients][${idx}][id]" value="${item.id}">
-             <input type="hidden" name="product[ingredients][${idx}][costPerUnit]" value="${item.cost_per_unit}">
-             <input type="hidden" name="product[ingredients][${idx}][quantity]" value="${item.quantity}">
-           </div>
-           `);
-         });
-         updateTotalCost();
-       }
-
-       function updateTotalCost() {
-         var total = ingList.reduce(function(sum, item) {
-           return sum + (parseFloat(item.cost_per_unit) * parseFloat(item.quantity));
-         }, 0);
-         $('#directCost').text('₱' + total.toFixed(2));
-       }
-
-       $('#addIng').on("click", function() {
-         let id = $('#materials').val();
-         let name = $('#materials option:selected').text().trim();
-         let quantity = $('#ingredient_quantity').val();
-         let cost_per_unit = $('#materials option:selected').data('cost');
-         let unit = $('#materials option:selected').data('unit');
-
-         if (!id || ingList.some(i => i.id === id) || !quantity || quantity <= 0) return;
-
-         ingList.push({ id, name, quantity, cost_per_unit, unit });
-         renderIngList();
-         filterMaterialsSelect();
-         $('#ingredient_quantity').val(''); // reset quantity input
-       });
-
-       $(document).on('click', '.remove-ing', function() {
-         let id = $(this).data("id").toString();
-         ingList = ingList.filter(i => i.id !== id);
-         renderIngList();
-         filterMaterialsSelect();
-       });
-
-       function filterMaterialsSelect() {
-         var addedIds = ingList.map(i => i.id);
-         $('#materials option').each(function() {
-           if (addedIds.includes($(this).val())) {
-             $(this).hide().prop('disabled', true);
-           } else {
-             $(this).show().prop('disabled', false);
-           }
-         });
-         var firstAvailable = $('#materials option:not(:disabled)').first().val();
-         $('#materials').val(firstAvailable);
-       }
-
-       function initIngredients() {
-         ingList = existingIngredients || [];
-         renderIngList();
-         filterMaterialsSelect();
-       }
-
-       document.addEventListener('turbo:load', initIngredients);
-       $(document).ready(initIngredients);
-    </script>
   </div>
-</div>
+  <style>
+    @keyframes steamRise {
+      0%, 100% { transform: translateY(0) scaleX(1); opacity: 0.7; }
+      50% { transform: translateY(-10px) scaleX(1.1); opacity: 0.2; }
+    }
+    @keyframes floatBean {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(15deg); }
+    }
+  </style>
+  <script>
+    var existingIngredients = <%= @ingredients.map { |i| {
+      id:           i.material_id.to_s,
+      name:         i.material.name,
+      quantity:     i.quantity,
+      cost_per_unit: i.material.cost_per_unit,
+      unit:         i.material.unit
+    } }.to_json.html_safe %>;
+
+    var ingList = [];
+
+    // ─── Costing calculations ────────────────────────────
+       function calcCosting() {
+      var directCost  = ingList.reduce(function(sum, item) {
+    return sum + (parseFloat(item.cost_per_unit) * parseFloat(item.quantity));
+      }, 0);
+
+      var overheadPct = parseFloat($('#overhead_percentage').val()) || 0;
+      var marginPct   = parseFloat($('#profit_margin_percentage').val())   || 0;
+
+      var overheadAmt       = directCost * (overheadPct / 100);
+      var totalCost         = directCost + overheadAmt;
+      var recommendedPrice  = marginPct < 100
+      ? totalCost / (1 - marginPct / 100)
+      : 0;
+      var marginAmt         = recommendedPrice - totalCost
+
+      // Update display
+      $('#display_direct_cost').text('₱' + directCost.toFixed(2));
+      $('#display_overhead_cost').text('₱' + overheadAmt.toFixed(2));
+      $('#display_total_cost').text('₱' + totalCost.toFixed(2));
+      $('#display_margin_amount').text('₱' + marginAmt.toFixed(2));
+      $('#display_recommended_price').text('₱' + recommendedPrice.toFixed(2));
+
+      // Update hidden fields for form submission
+      $('#direct_cost_field').val(directCost.toFixed(2));
+      $('#overhead_pct_field').val(overheadPct.toFixed(2));
+      $('#overhead_cost_field').val(overheadAmt.toFixed(2));
+      $('#total_cost_field').val(totalCost.toFixed(2));
+      $('#profit_margin_pct_field').val(marginPct.toFixed(2));
+      $('#profit_margin_cost_field').val(marginAmt.toFixed(2));
+
+      var sellingPrice  = parseFloat($('#selling_price').val()) || 0;
+      $('#selling_price_field').val(sellingPrice.toFixed(2));
+
+      var actualProfit  = sellingPrice - totalCost;
+      var actualMarginPct = sellingPrice > 0 ? (actualProfit / sellingPrice) * 100 : 0;
+
+      $('#display_actual_profit').text('₱' + actualProfit.toFixed(2))
+    .removeClass('text-green-700 text-red-600')
+    .addClass(actualProfit >= 0 ? 'text-green-700' : 'text-red-600');
+
+      $('#display_actual_margin_pct').text(actualMarginPct.toFixed(2) + '%')
+    .removeClass('text-green-600 text-red-500 bg-green-100 bg-red-100')
+    .addClass(actualProfit >= 0 ? 'text-green-600 bg-green-100' : 'text-red-500 bg-red-100');
+    }
+
+    // ─── Render ingredient list ──────────────────────────
+    function renderIngList() {
+      $('#ingDisplay').empty();
+
+      if (ingList.length === 0) {
+        $('#ingDisplay').append(`
+          <div class="text-center py-4 bg-amber-50/50 rounded-xl border border-dashed border-amber-200">
+            <p class="text-xs text-amber-400 font-medium italic">🫘 No ingredients added yet — start building your blend!</p>
+          </div>
+        `);
+        calcCosting();
+        return;
+      }
+
+      ingList.forEach(function(item, idx) {
+        var itemCost = (parseFloat(item.cost_per_unit) * parseFloat(item.quantity)).toFixed(2);
+        $('#ingDisplay').append(`
+          <div id="ing-${item.id}" class="flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl">
+            <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shrink-0"></div>
+            <span class="text-sm font-semibold text-amber-800 flex-1">${item.name}</span>
+            <span class="text-xs text-amber-500 font-medium">${parseFloat(item.quantity).toFixed(2)} ${item.unit}</span>
+            <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-lg">₱${itemCost}</span>
+            <button type="button" class="remove-ing w-6 h-6 flex items-center justify-center rounded-lg text-amber-300 hover:text-red-400 hover:bg-red-50 transition-all duration-150" data-id="${item.id}">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+            <input type="hidden" name="product[ingredients][${idx}][id]"           value="${item.id}">
+            <input type="hidden" name="product[ingredients][${idx}][quantity]"      value="${item.quantity}">
+            <input type="hidden" name="product[ingredients][${idx}][cost_per_unit]" value="${item.cost_per_unit}">
+          </div>
+        `);
+      });
+
+      calcCosting();
+    }
+
+    // ─── Filter select ───────────────────────────────────
+    function filterMaterialsSelect() {
+      var addedIds = ingList.map(i => i.id);
+      $('#materials option').each(function() {
+        if (addedIds.includes($(this).val())) {
+          $(this).hide().prop('disabled', true);
+        } else {
+          $(this).show().prop('disabled', false);
+        }
+      });
+      $('#materials').val($('#materials option:not(:disabled)').first().val());
+    }
+
+    // ─── Add ingredient ──────────────────────────────────
+    $('#addIng').on("click", function() {
+      var id           = $('#materials').val();
+      var name         = $('#materials option:selected').text().trim();
+      var cost_per_unit = parseFloat($('#materials option:selected').data('cost')) || 0;
+      var unit         = $('#materials option:selected').data('unit') || '';
+      var quantity     = parseFloat($('#ingredient_quantity').val());
+
+      if (!id || ingList.some(i => i.id === id)) return;
+
+      if (!quantity || quantity <= 0) {
+        $('#ingredient_quantity').addClass('border-red-400 ring-2 ring-red-200').focus();
+        return;
+      }
+      $('#ingredient_quantity').removeClass('border-red-400 ring-2 ring-red-200');
+
+      ingList.push({ id, name, quantity, cost_per_unit, unit });
+      $('#ingredient_quantity').val('');
+      renderIngList();
+      filterMaterialsSelect();
+    });
+
+    // ─── Remove ingredient ───────────────────────────────
+    $(document).on('click', '.remove-ing', function() {
+      var id = $(this).data("id").toString();
+      ingList = ingList.filter(i => i.id !== id);
+      renderIngList();
+      filterMaterialsSelect();
+    });
+
+    // ─── Recalculate on overhead/margin change ───────────
+       $('#overhead_percentage, #profit_margin_percentage, #selling_price').on('input', calcCosting);
+
+    // ─── Init ────────────────────────────────────────────
+    function initIngredients() {
+      ingList = existingIngredients || [];
+      renderIngList();
+      filterMaterialsSelect();
+    }
+
+    // ─── Thumbnail preview ───────────────────────────────
+    function bindThumbnailPreview() {
+      $(document).off('change', '#product_thumbnail_input');
+      $(document).on('change', '#product_thumbnail_input', function(e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        $('#thumbnail-file-name').text(file.name);
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          $('#thumbnail_preview').attr('src', ev.target.result).removeClass('hidden');
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.addEventListener('turbo:load', function() { bindThumbnailPreview(); initIngredients(); });
+    $(document).ready(function() { bindThumbnailPreview(); initIngredients(); });
+  </script>
