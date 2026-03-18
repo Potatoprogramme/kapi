@@ -114,16 +114,4 @@ class ProductsController < ApplicationController
     product_costing = ProductCosting.find_by(product_id: product_id)
     product_costing.presence&.update(product_costing_params)
   end
-
-  def validate_product_costing(product)
-    overhead_cost = (product.direct_cost * (product.overhead_percentage / 100)).to_f.round(2)
-    total_cost = (product.overhead_cost + product.direct_cost).to_f.round(2)
-    recommended_selling = (product.total_cost / (1 - (product.profit_margin_percentage / 100))).to_f.round(2)
-    profit_margin_amount = (recommended_selling - total_cost).to_f.round(2)
-    if (overhead_cost == product.overhead_cost) &&
-       (total_cost == product.total_cost) &&
-       (profit_margin_amount == product.profit_margin_amount)
-      true
-    end
-  end
 end
