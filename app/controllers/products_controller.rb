@@ -21,7 +21,7 @@ class ProductsController < ApplicationController
   def create
     insert_product
     redirect_to products_path, notice: t('.success')
-  rescue StandardError => e
+  rescue ActiveRecord::RecordInvalid => e
     load_form_data
     @product.errors.add(:ingredients, 'cannot be empty') unless params[:product].key?('ingredients')
     flash.now[:alert] = e.message
