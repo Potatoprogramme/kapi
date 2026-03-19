@@ -94,16 +94,28 @@ class ProductsController < ApplicationController
   def update_product
     ActiveRecord::Base.transaction do
       @product.update(product_params)
-      insert_ingredient('update')
+      update_ingredient
       update_product_costing(@product.id)
     end
   end
 
-  def insert_ingredient(method = nil)
-    Ingredient.where(product_id: @product.id).destroy_all if method == 'update'
+  def insert_ingredient
     ingredient_params.each do |material|
       new = Ingredient.create!(product_id: @product.id, material_id: material['id'])
       insert_ingredient_costing(new.id, material['quantity'], material['cost_per_unit'])
+    end
+  end
+
+  def update_ingredient
+    # if it exist in form but not in database - add new ingredient
+    # if it exist in datbase but not in form - remove that ingredient
+    existing = Ingredient.where(product_id: @product.id).left_joins(:ingredient_costing)
+                         .select('ingredients.material_id, ingredient_costings.quantity')
+    debugger
+    ingredients_params.each do |material|
+      existing.each do |existing|
+        update if (material['id'] == existing.material_id) && (material['quantity'] != existing.quantity)
+      end
     end
   end
 
