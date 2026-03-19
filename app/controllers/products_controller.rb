@@ -4,10 +4,17 @@ class ProductsController < ApplicationController
   before_action :set_product, only: %i[show edit update destroy]
   allow_unauthenticated_access only: %i[index show]
   def index
-    @products = Product.all
+    @products = Product.active
   end
 
-  def show; end
+  def show
+    @product = Product.left_joins(:product_costing, :product_category)
+                      .where(id: @product.id)
+                      .select('products.*, product_costings.*, product_categories.name as category_name')
+                      .first
+    @ingredients = Ingredient.where(product_id: @product.product_id)
+                             .left_joins(:material, :ingredient_costing).select('*')
+  end
 
   def new
     @product = Product.new
@@ -105,8 +112,6 @@ class ProductsController < ApplicationController
 
   def insert_product_costing(product_id)
     product_costing = ProductCosting.new(product_costing_params.merge(product_id: product_id))
-    return unless validate_product_costing(product_costing)
-
     product_costing.save!
   end
 
