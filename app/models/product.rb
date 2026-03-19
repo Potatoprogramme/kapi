@@ -8,5 +8,5 @@ class Product < ApplicationRecord
   has_one :product_costing, dependent: :destroy
   validates :thumbnail, :name, presence: true
   belongs_to :product_category
-  enum :status, { deleted: 0, active: 1, inactive: 2 }, default: :active
+  enum :status, { deleted: 0, active: 1 }, default: :active
 end
