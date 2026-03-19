@@ -4,10 +4,20 @@ class ProductsController < ApplicationController
   before_action :set_product, only: %i[show edit update destroy]
   allow_unauthenticated_access only: %i[index show]
   def index
-    @products = Product.all
+    @products = Product.active.left_joins(:product_costing,
+                                          :product_category)
+                       .select('products.*, product_costings.selling_price, product_categories.name as category_name')
   end
 
-  def show; end
+  def show
+    @product = Product.left_joins(:product_costing, :product_category)
+                      .where(id: @product.id)
+                      .select('products.*, product_costings.*,
+                      product_categories.name as category_name, product_categories.description')
+                      .first
+    @ingredients = Ingredient.where(product_id: @product.product_id)
+                             .left_joins(:material, :ingredient_costing).select('*')
+  end
 
   def new
     @product = Product.new
@@ -105,25 +115,11 @@ class ProductsController < ApplicationController
 
   def insert_product_costing(product_id)
     product_costing = ProductCosting.new(product_costing_params.merge(product_id: product_id))
-    return unless validate_product_costing(product_costing)
-
     product_costing.save!
   end
 
   def update_product_costing(product_id)
     product_costing = ProductCosting.find_by(product_id: product_id)
     product_costing.presence&.update(product_costing_params)
-  end
-
-  def validate_product_costing(product)
-    overhead_cost = (product.direct_cost * (product.overhead_percentage / 100)).to_f.round(2)
-    total_cost = (product.overhead_cost + product.direct_cost).to_f.round(2)
-    recommended_selling = (product.total_cost / (1 - (product.profit_margin_percentage / 100))).to_f.round(2)
-    profit_margin_amount = (recommended_selling - total_cost).to_f.round(2)
-    if (overhead_cost == product.overhead_cost) &&
-       (total_cost == product.total_cost) &&
-       (profit_margin_amount == product.profit_margin_amount)
-      true
-    end
   end
 end

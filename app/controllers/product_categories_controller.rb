@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ProductCategoriesController < ApplicationController
-  before_action :set_product_category, only: %i[destroy]
+  before_action :set_product_category, only: %i[edit update destroy]
   def index
     @categories = ProductCategory.all
   end
@@ -10,6 +10,8 @@ class ProductCategoriesController < ApplicationController
     @category = ProductCategory.new
   end
 
+  def edit; end
+
   def create
     @category = ProductCategory.new(product_category_params)
     if @category.save
@@ -17,6 +19,11 @@ class ProductCategoriesController < ApplicationController
     else
       render :new, status: :unprocessable_content
     end
+  end
+
+  def update
+    @category.update(product_category_params)
+    redirect_to product_category_path(@category)
   end
 
   def destroy
@@ -31,6 +38,6 @@ class ProductCategoriesController < ApplicationController
   end
 
   def product_category_params
-    params.expect(product_category: %i[name description color])
+    params.expect(product_category: %i[name description])
   end
 end
