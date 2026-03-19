@@ -49,7 +49,7 @@ class ProductsController < ApplicationController
   end
 
   def destroy
-    @product.destroy
+    soft_delete_product
     redirect_to products_path, notice: t('.success')
   end
 
@@ -121,5 +121,9 @@ class ProductsController < ApplicationController
   def update_product_costing(product_id)
     product_costing = ProductCosting.find_by(product_id: product_id)
     product_costing.presence&.update(product_costing_params)
+  end
+
+  def soft_delete_product
+    @product.update(status: :deleted)
   end
 end
