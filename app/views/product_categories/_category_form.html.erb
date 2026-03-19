@@ -24,14 +24,6 @@
       <%= form.label :description, "Description", class: "block text-sm font-medium text-amber-800" %>
       <%= form.text_area :description, placeholder: "Write a short description of the category...", rows: 3, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" %>
     </div>
-    <!-- Color Picker -->
-    <div class="mb-6">
-      <%= form.label :color, "Category Color", class: "block text-sm font-medium text-amber-800" %>
-      <div class="flex items-center gap-4">
-        <%= form.color_field :color, class: "mt-1 block w-20 h-10 border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" %>
-        <span class="text-sm text-gray-500">Pick a color to represent this category.</span>
-      </div>
-    </div>
     <!-- Submit Button -->
     <div class="flex justify-end">
       <%= form.submit "Save Category", class: "px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-md shadow hover:from-amber-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500" %>
