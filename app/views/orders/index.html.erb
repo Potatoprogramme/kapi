@@ -1,0 +1,359 @@
+<div class="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 pb-24">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-8">
+      <% tabs = { 'pending' => 'Pending', 'completed' => 'Completed', 'voided' => 'Voided' } %>
+      <% current_tab = params[:tab] || 'pending' %>
+      <% tabs.each do |key, label| %>
+        <%= link_to orders_path(tab: key),
+					class: "px-6 py-2 rounded-full font-bold text-sm transition-all duration-200 #{current_tab == key ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow' : 'bg-white/70 text-amber-700 hover:bg-amber-100'}" do %>
+          <%= label %>
+        <% end %>
+      <% end %>
+    </div>
+    <!-- Orders List -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% (@orders || []).each do |order| %>
+        <div class="bg-white/90 rounded-2xl shadow-lg border border-amber-100 p-6 flex flex-col gap-3 relative">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-xs font-bold text-amber-700 tracking-widest">ORDER #<%= order.id.to_s.rjust(4, '0') %></div>
+            <span class="text-xs px-2 py-0.5 rounded-full font-semibold <%= {
+							'pending' => 'bg-amber-100 text-amber-700',
+							'completed' => 'bg-green-100 text-green-700',
+							'voided' => 'bg-red-100 text-red-600'
+						}[order.status] %>"><%= order.status.capitalize %></span>
+          </div>
+          <div class="flex items-center gap-3 mb-1">
+            <span class="font-black text-lg text-gray-800"><%= order.customer_name %></span>
+            <span class="text-xs text-gray-400"><%= order.created_at.strftime('%b %d, %Y %I:%M%p') %></span>
+          </div>
+          <div class="text-sm text-gray-600 mb-2">
+            <ul class="list-disc pl-5">
+              <% order.order_items.each do |item| %>
+                <li><span class="font-semibold"><%= item.product.name %></span> × <%= item.quantity %></li>
+              <% end %>
+            </ul>
+          </div>
+          <div class="flex items-center justify-between mt-2">
+            <span class="font-bold text-amber-700">₱<%= number_with_precision(order.order_total, precision: 2) %></span>
+            <div class="flex gap-2">
+              <% if order.status == 'pending' %>
+                <%= link_to 'Complete', complete_order_path(order), method: :patch, class: 'text-green-600 hover:underline text-xs font-bold' %>
+                <%= link_to 'Void', void_order_path(order), method: :patch, class: 'text-red-500 hover:underline text-xs font-bold' %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      <% if (@orders || []).empty? %>
+        <div class="col-span-full text-center py-24 text-gray-400 text-xl font-bold">No orders found.</div>
+      <% end %>
+    </div>
+  </div>
+  <!-- Floating Create Order Button -->
+  <button id="create-order-btn" class="fixed bottom-8 right-8 z-50 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-full shadow-xl w-16 h-16 flex items-center justify-center text-3xl font-black focus:outline-none transition-all duration-300">
+    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+    </svg>
+  </button>
+  <!-- Create Order Modal -->
+  <div id="order-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-0 relative max-h-[90vh] flex flex-col">
+      <button id="close-order-modal" class="absolute top-3 right-3 text-gray-400 hover:text-amber-600 text-2xl font-black z-10">&times;</button>
+      <%# ── STEP 1: Product Selection ── %>
+      <div id="step-1">
+        <div class="overflow-y-auto px-8 pt-8 pb-0 flex-1" style="max-height: 55vh;">
+          <div class="flex items-center gap-3 mb-1">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">Step 1 of 2</span>
+          </div>
+          <h2 class="text-2xl font-black text-amber-700 mb-2">Select Items</h2>
+          <p class="text-sm text-gray-500 mb-6">Choose products and set quantities.</p>
+          <%= form_with model: @order, url: orders_path, data: { turbo: false }, html: { id: 'order-form' }, method: :post do |f| %>
+            <% grouped_products = (@products || []).group_by { |p| p.product_category&.name || 'Uncategorized' } %>
+            <% grouped_products.each do |category, products| %>
+              <div class="mb-4">
+                <h3 class="text-lg font-black text-amber-700 mb-2"><%= category %></h3>
+                <div class="grid grid-cols-3 gap-3">
+                  <% products.each do |product| %>
+                    <div class="border rounded-xl p-3 flex flex-col items-center product-select-card transition-all duration-200 hover:shadow-lg hover:border-amber-400 cursor-pointer" data-product-id="<%= product.id %>">
+                      <button type="button" class="product-toggle-btn w-full px-3 py-2 rounded-lg font-bold text-amber-700 border border-amber-300 bg-amber-50 hover:bg-amber-100 mb-2 transition flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-amber-400"
+                      data-product-id="<%= product.id %>"
+                      data-product-price="<%= product.selling_price || 0 %>">
+                        <span><%= product.name %></span>
+                        <span class="text-xs text-green-700 font-bold mt-1">₱<%= number_with_precision(product.selling_price, precision: 2) %></span>
+                      </button>
+                      <div class="flex items-center gap-2 w-full">
+                        <label class="text-xs text-gray-500">Qty</label>
+                        <button type="button" class="qty-btn minus px-2 py-1 rounded bg-amber-100 text-amber-700 font-bold text-lg disabled:opacity-50" data-product-id="<%= product.id %>" disabled>-</button>
+                        <input type="number" min="1" value="1"
+                        name="order[order_items_attributes][<%= product.id %>][quantity]"
+                        class="quantity-input w-12 px-2 py-1 border rounded-lg text-center disabled:bg-gray-100"
+                        data-product-id="<%= product.id %>" disabled>
+                        <button type="button" class="qty-btn plus px-2 py-1 rounded bg-amber-100 text-amber-700 font-bold text-lg disabled:opacity-50" data-product-id="<%= product.id %>" disabled>+</button>
+                      </div>
+                      <input type="hidden" name="order[order_items_attributes][<%= product.id %>][product_id]" value="<%= product.id %>" disabled class="product-id-hidden" data-product-id="<%= product.id %>">
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+            <%# Hidden fields submitted with form %>
+            <input type="hidden" name="order[order_total]"    id="order-total-hidden"   value="0">
+            <input type="hidden" name="order[payment_method]"  id="order-payment-hidden" value="cash">
+          <% end %>
+        </div>
+        <%# Step 1 sticky footer — summary + Next button %>
+        <div class="sticky bottom-0 bg-white/95 pt-4 pb-4 px-8 rounded-b-2xl shadow-inner">
+          <h4 class="text-sm font-bold text-amber-700 mb-2">Order Summary</h4>
+          <div id="order-summary-list" class="space-y-1.5 max-h-[100px] overflow-y-auto pr-1"></div>
+          <div id="order-summary-empty" class="text-gray-400 text-sm text-center py-1 hidden">No items selected yet.</div>
+          <div class="flex justify-between items-center mt-3 border-t pt-3">
+            <span class="font-bold text-gray-700">Total</span>
+            <span id="order-summary-total" class="font-black text-2xl text-green-700">₱0.00</span>
+          </div>
+          <button type="button" id="go-to-step-2"
+          class="w-full mt-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 active:scale-[0.99] text-white font-black py-3 rounded-xl transition-all duration-200 shadow-lg text-base disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled>
+            Choose Payment
+          </button>
+        </div>
+      </div>
+      <%# ── STEP 2: Payment Method ── %>
+      <div id="step-2" class="hidden px-8 pt-8 pb-8 flex flex-col gap-6">
+        <div>
+          <button type="button" id="back-to-step-1" class="inline-flex items-center gap-1.5 text-sm text-amber-600 hover:text-amber-800 font-semibold mb-4 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back
+          </button>
+          <span class="block text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">Step 2 of 2</span>
+          <h2 class="text-2xl font-black text-amber-700 mb-1">Payment Method</h2>
+          <p class="text-sm text-gray-500">How will your customer pay?</p>
+        </div>
+        <%# Payment options %>
+        <div class="grid grid-cols-2 gap-3">
+          <!-- Cash -->
+          <button type="button"
+    class="payment-opt-btn flex items-center gap-4 p-4 border-2 border-amber-200 rounded-2xl hover:border-amber-400 transition-all duration-150 text-left"
+    data-value="cash">
+            <span class="text-3xl">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12.5a3.5 3.5 0 1 0 0 7a3.5 3.5 0 0 0 0-7ZM10.5 16a1.5 1.5 0 1 1 3 0a1.5 1.5 0 0 1-3 0Z"/>
+                <path d="M17.526 5.116L14.347.659L2.658 9.997L2.01 9.99V10H1.5v12h21V10h-.962l-1.914-5.599l-2.098.715ZM19.425 10H9.397l7.469-2.546l1.522-.487L19.425 10ZM15.55 5.79L7.84 8.418l6.106-4.878l1.604 2.25ZM3.5 18.169v-4.34A3.008 3.008 0 0 0 5.33 12h13.34a3.009 3.009 0 0 0 1.83 1.83v4.34A3.009 3.009 0 0 0 18.67 20H5.332A3.01 3.01 0 0 0 3.5 18.169Z"/>
+              </svg>
+            </span>
+            <div>
+              <p class="text-sm font-black text-amber-900">Cash</p>
+              <p class="text-xs text-amber-400">Pay with physical cash</p>
+            </div>
+          </button>
+          <!-- GCash -->
+          <button type="button"
+    class="payment-opt-btn flex items-center gap-4 p-4 border-2 border-amber-200 rounded-2xl hover:border-amber-400 transition-all duration-150 text-left"
+    data-value="gcash">
+            <span class="text-3xl">
+              <%= image_tag 'gcash.png', class: 'h-6 inline' %>
+            </span>
+            <div>
+              <p class="text-sm font-black text-amber-900">GCash</p>
+              <p class="text-xs text-amber-400">GCash mobile wallet</p>
+            </div>
+          </button>
+          <!-- Maya -->
+          <button type="button"
+    class="payment-opt-btn flex items-center gap-4 p-4 border-2 border-amber-200 rounded-2xl hover:border-amber-400 transition-all duration-150 text-left"
+    data-value="maya">
+            <span class="text-3xl">
+              <%= image_tag 'Maya Logo.svg', class: 'h-6 inline' %>
+            </span>
+            <div>
+              <p class="text-sm font-black text-amber-900">Maya</p>
+              <p class="text-xs text-amber-400">Maya digital wallet</p>
+            </div>
+          </button>
+          <!-- Card -->
+          <button type="button"
+    class="payment-opt-btn flex items-center gap-4 p-4 border-2 border-amber-200 rounded-2xl hover:border-amber-400 transition-all duration-150 text-left"
+    data-value="card">
+            <span class="text-3xl">
+              <%= image_tag 'Visa PNG.png', class: 'h-6 inline' %>
+            </span>
+            <div>
+              <p class="text-sm font-black text-amber-900">Card</p>
+              <p class="text-xs text-amber-400">Debit or credit card</p>
+            </div>
+          </button>
+        </div>
+        <%# Order total recap %>
+        <div class="flex items-center justify-between px-5 py-4 bg-amber-50 rounded-2xl border border-amber-200">
+          <div>
+            <p class="text-xs font-semibold text-amber-500 uppercase tracking-wide">Order Total</p>
+            <p id="step2-total" class="text-2xl font-black text-orange-600">₱0.00</p>
+          </div>
+          <div id="step2-payment-badge" class="flex items-center gap-2 px-4 py-2 bg-white border border-amber-300 rounded-xl">
+            <span id="step2-payment-label" class="text-sm font-bold text-amber-800">Cash</span>
+          </div>
+        </div>
+        <%# Place order button %>
+        <button type="submit" form="order-form"
+        class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 active:scale-[0.99] text-white font-black py-3.5 rounded-xl transition-all duration-200 shadow-lg text-base">
+          Place Order
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // Modal open/close logic (jQuery)
+  $(function() {
+    var $btn = $('#create-order-btn');
+    var $modal = $('#order-modal');
+    var $close = $('#close-order-modal');
+    function openModal() {
+      $modal.removeClass('hidden');
+      $('body').addClass('overflow-hidden');
+    }
+    function closeModal() {
+      $modal.addClass('hidden');
+      $('body').removeClass('overflow-hidden');
+    }
+    $btn.on('click', openModal);
+    $close.on('click', closeModal);
+    $modal.on('click', function(e) {
+      if (e.target === $modal[0]) closeModal();
+    });
+
+    // Product toggle logic & summary
+    function updateOrderSummary() {
+      var $summary = $('#order-summary-list');
+      var $total = $('#order-summary-total');
+      var $empty = $('#order-summary-empty');
+      $summary.empty();
+      var total = 0;
+      var count = 0;
+      $('.product-select-card').each(function() {
+        var $card = $(this);
+        var $qty = $card.find('.quantity-input');
+        var $btn = $card.find('.product-toggle-btn');
+        var $hidden = $card.find('.product-id-hidden');
+        var productName = $btn.find('span:first').text();
+        var price = parseFloat($btn.data('product-price')) || 0;
+        var qty = parseInt($qty.val(), 10) || 0;
+        if (!$qty.prop('disabled') && qty > 0) {
+          var itemTotal = price * qty;
+          total += itemTotal;
+          count++;
+          $summary.append('<div class="flex justify-between items-center border-b pb-1"><span class="font-semibold">' + productName + ' × ' + qty + '</span><span class="text-green-700 font-bold">₱' + itemTotal.toFixed(2) + '</span></div>');
+        }
+      });
+      $total.text('₱' + total.toFixed(2));
+      if (count === 0) {
+        $empty.removeClass('hidden');
+      } else {
+        $empty.addClass('hidden');
+      }
+      $('#order-total-hidden').val(total.toFixed(2));
+      updateNextButton();
+    }
+
+    $('.product-toggle-btn').on('click', function() {
+      var productId = $(this).data('product-id');
+      var $card = $('.product-select-card[data-product-id="' + productId + '"]');
+      var $qty = $card.find('.quantity-input');
+      var $hidden = $card.find('.product-id-hidden');
+      var $minus = $card.find('.qty-btn.minus');
+      var $plus = $card.find('.qty-btn.plus');
+      var selected = !$qty.prop('disabled');
+      if (selected) {
+        $qty.prop('disabled', true);
+        $hidden.prop('disabled', true);
+        $minus.prop('disabled', true);
+        $plus.prop('disabled', true);
+        $(this).removeClass('bg-amber-200 border-amber-500').addClass('bg-amber-50 border-amber-300');
+      } else {
+        $qty.prop('disabled', false);
+        $hidden.prop('disabled', false);
+        $minus.prop('disabled', false);
+        $plus.prop('disabled', false);
+        $(this).removeClass('bg-amber-50 border-amber-300').addClass('bg-amber-200 border-amber-500');
+        if ($qty.val() === '' || $qty.val() === '0') $qty.val(1);
+      }
+      updateOrderSummary();
+    });
+
+    // Plus/minus quantity logic
+    $('.qty-btn').on('click', function() {
+      var productId = $(this).data('product-id');
+      var $card = $('.product-select-card[data-product-id="' + productId + '"]');
+      var $qty = $card.find('.quantity-input');
+      if ($qty.prop('disabled')) return;
+      var val = parseInt($qty.val(), 10) || 1;
+      if ($(this).hasClass('plus')) {
+        $qty.val(val + 1);
+      } else if ($(this).hasClass('minus')) {
+        if (val > 1) $qty.val(val - 1);
+      }
+      $qty.trigger('input');
+      updateOrderSummary();
+    });
+
+    // Update summary on quantity change
+    $('.quantity-input').on('input', function() {
+      updateOrderSummary();
+    });
+
+    // Initialize summary on modal open
+    $('#create-order-btn').on('click', function() {
+      setTimeout(updateOrderSummary, 100);
+    });
+  });
+
+  var selectedPayment = { value: 'cash', label: 'Cash' };
+
+  function goToStep2() {
+  $('#step-1').addClass('hidden');
+  $('#step-2').removeClass('hidden');
+  $('#step2-total').text($('#order-summary-total').text());
+  }
+
+  function goToStep1() {
+  $('#step-2').addClass('hidden');
+  $('#step-1').removeClass('hidden');
+  }
+
+  $('#go-to-step-2').on('click', goToStep2);
+  $('#back-to-step-1').on('click', goToStep1);
+
+  // Payment method selection
+  $('.payment-opt-btn').on('click', function() {
+  var value = $(this).data('value');
+  var label = $(this).find('p:first').text();
+  var icon  = $(this).find('span:first').text();
+
+  selectedPayment = { value, label, icon };
+
+  // Update hidden field
+  $('#order-payment-hidden').val(value);
+
+  // Update badge in recap
+  $('#step2-payment-icon').text(icon);
+  $('#step2-payment-label').text(label);
+
+  // Highlight selected
+  $('.payment-opt-btn')
+    .removeClass('border-amber-500 bg-amber-50')
+    .addClass('border-amber-200');
+  $(this)
+    .removeClass('border-amber-200')
+    .addClass('border-amber-500 bg-amber-50');
+  });
+
+  // Enable Next button when at least 1 item selected
+  function updateNextButton() {
+  var hasItems = $('.product-select-card').toArray().some(function(card) {
+    return !$(card).find('.quantity-input').prop('disabled');
+  });
+  $('#go-to-step-2').prop('disabled', !hasItems);
+  }
+</script>

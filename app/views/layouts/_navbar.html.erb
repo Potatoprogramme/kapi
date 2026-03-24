@@ -32,15 +32,14 @@
           </div>
           <span>Coffee Menu</span>
         <% end %>
-        <%= link_to product_categories_path, 
-            class: "group flex items-center space-x-2 px-6 py-3 rounded-2xl font-bold transition-all duration-300 transform hover:-translate-y-1 #{'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg' if current_page?(product_categories_path)} #{'bg-white/60 backdrop-blur-sm text-amber-700 hover:bg-amber-100/80 shadow-md' unless current_page?(product_categories_path)}" do %>
-          <div class="w-8 h-8 <%= current_page?(product_categories_path) ? 'bg-white/20' : 'bg-amber-100' %> rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
-            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+        <%= link_to orders_path, 
+            class: "group flex items-center space-x-2 px-6 py-3 rounded-2xl font-bold transition-all duration-300 transform hover:-translate-y-1 #{'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg' if current_page?(orders_path)} #{'bg-white/60 backdrop-blur-sm text-amber-700 hover:bg-amber-100/80 shadow-md' unless current_page?(orders_path)}" do %>
+          <div class="w-8 h-8 <%= current_page?(orders_path) ? 'bg-white/20' : 'bg-amber-100' %> rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M5 19V8.1L3.242 4.235l.916-.427L6.085 8.05h11.83l1.927-4.242l.916.427L19 8.1V19H5Zm5-6.5h4q.213 0 .356-.144q.144-.144.144-.357t-.144-.356Q14.213 11.5 14 11.5h-4q-.213 0-.356.144q-.144.144-.144.357t.144.356q.144.143.356.143ZM6 18h12V9.05H6V18Zm0 0V9.05V18Z"/>
             </svg>
           </div>
-          <span>Coffee Categories</span>
+          <span>Manage Orders</span>
         <% end %>
         <!-- Extra Cute Coffee Actions -->
         <div class="flex items-center space-x-2 ml-4">
@@ -93,6 +92,15 @@
               </svg>
             </div>
             <span class="text-lg">Coffee Menu</span>
+          <% end %>
+          <%= link_to orders_path, 
+              class: "group flex items-center space-x-3 p-4 rounded-2xl font-bold transition-all duration-300 #{'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg' if current_page?(orders_path)} #{'bg-amber-50 text-amber-700 hover:bg-amber-100' unless current_page?(orders_path)}" do %>
+            <div class="w-10 h-10 <%= current_page?(orders_path) ? 'bg-white/20' : 'bg-amber-200' %> rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M5 19V8.1L3.242 4.235l.916-.427L6.085 8.05h11.83l1.927-4.242l.916.427L19 8.1V19H5Zm5-6.5h4q.213 0 .356-.144q.144-.144.144-.357t-.144-.356Q14.213 11.5 14 11.5h-4q-.213 0-.356.144q-.144.144-.144.357t.144.356q.144.143.356.143ZM6 18h12V9.05H6V18Zm0 0V9.05V18Z"/>
+              </svg>
+            </div>
+            <span class="text-lg">Manage Orders</span>
           <% end %>
           <%= link_to product_categories_path, 
               class: "group flex items-center space-x-3 p-4 rounded-2xl font-bold transition-all duration-300 #{'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg' if current_page?(product_categories_path)} #{'bg-amber-50 text-amber-700 hover:bg-amber-100' unless current_page?(product_categories_path)}" do %>

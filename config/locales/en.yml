@@ -56,3 +56,7 @@ en:
     destroy:
       success: "Category successfully deleted."
       failure: "Failed to delete category."
+  orders:
+    create:
+      success: "Order created successfully."
+      failure: "Failed to create order."

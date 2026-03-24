@@ -49,7 +49,7 @@ class ProductsController < ApplicationController
   end
 
   def destroy
-    @product.destroy
+    soft_delete_product
     redirect_to products_path, notice: t('.success')
   end
 
@@ -86,7 +86,7 @@ class ProductsController < ApplicationController
     @product = Product.new(product_params)
     ActiveRecord::Base.transaction do
       @product.save!
-      insert_ingredient
+      insert_ingredients
       insert_product_costing(@product.id)
     end
   end
@@ -94,16 +94,45 @@ class ProductsController < ApplicationController
   def update_product
     ActiveRecord::Base.transaction do
       @product.update(product_params)
-      insert_ingredient('update')
+      update_ingredient
       update_product_costing(@product.id)
     end
   end
 
-  def insert_ingredient(method = nil)
-    Ingredient.where(product_id: @product.id).destroy_all if method == 'update'
+  def insert_ingredients
     ingredient_params.each do |material|
       new = Ingredient.create!(product_id: @product.id, material_id: material['id'])
       insert_ingredient_costing(new.id, material['quantity'], material['cost_per_unit'])
+    end
+  end
+
+  def update_ingredient
+    existing = Ingredient.where(product_id: @product.id).includes(:ingredient_costing)
+    existing_map = existing.index_by(&:material_id)
+    param_ids = ingredient_params.map { |m| m['id'].to_i }
+
+    # Remove ingredients not in params
+    (existing_map.keys - param_ids).each do |material_id|
+      ing = existing_map[material_id]
+      ing.presence&.destroy
+    end
+
+    ingredient_params.each do |material|
+      mat_id = material['id'].to_i
+      qty = material['quantity']
+      cost_per_unit = material['cost_per_unit']
+
+      if existing_map[mat_id]
+        # Update quantity if changed
+        costing = existing_map[mat_id].ingredient_costing
+        if costing && costing.quantity.to_s != qty.to_s
+          costing.update(quantity: qty, ingredient_total_cost: qty.to_f * cost_per_unit.to_f)
+        end
+      else
+        # Add new ingredient
+        new_ing = Ingredient.create!(product_id: @product.id, material_id: mat_id)
+        insert_ingredient_costing(new_ing.id, qty, cost_per_unit)
+      end
     end
   end
 
@@ -121,5 +150,9 @@ class ProductsController < ApplicationController
   def update_product_costing(product_id)
     product_costing = ProductCosting.find_by(product_id: product_id)
     product_costing.presence&.update(product_costing_params)
+  end
+
+  def soft_delete_product
+    @product.update(status: :deleted)
   end
 end

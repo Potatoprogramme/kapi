@@ -20,5 +20,6 @@ Rails.application.routes.draw do
   resources :materials
   resources :products
   resources :product_categories
+  resources :orders
   get '/', to: 'home#index'
 end
