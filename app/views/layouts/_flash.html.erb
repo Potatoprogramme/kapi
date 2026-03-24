@@ -1,5 +1,5 @@
-<div id="toast" class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
-  <div class="flex flex-col items-end space-y-2">
+<div id="toast" class="fixed top-30 left-1/2 transform -translate-x-1/2 z-50 w-full flex justify-center pointer-events-none">
+  <div class="flex flex-col items-center space-y-2 max-w-md w-full pointer-events-auto">
     <% flash.each do |key, message| %>
       <% next if message.blank? %>
       <div class="flash-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm max-w-xs w-full

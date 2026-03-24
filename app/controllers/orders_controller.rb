@@ -11,6 +11,7 @@ class OrdersController < ApplicationController
 
   def create
     insert_order
+    redirect_to orders_path, notice: t('.success')
   end
 
   private
@@ -25,6 +26,7 @@ class OrdersController < ApplicationController
 
   def insert_order
     order = Order.new(order_params)
+    order[:user_id] = Current.user.id
     ActiveRecord::Base.transaction do
       order.save!
     end
