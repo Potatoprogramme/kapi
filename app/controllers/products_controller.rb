@@ -29,6 +29,7 @@ class ProductsController < ApplicationController
   end
 
   def create
+    # render json: { product_params: product_params, ingredient_params: ingredient_params }
     insert_product
     redirect_to products_path, notice: t('.success')
   rescue ActiveRecord::RecordInvalid => e
@@ -60,11 +61,15 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.expect(product: %i[name thumbnail product_category_id])
+    params.expect(product: %i[
+                    name
+                    thumbnail
+                    product_category_id
+                  ])
   end
 
   def ingredient_params
-    params[:product][:ingredients]&.values
+    params.expect(product: { ingredients: [%i[id quantity cost_per_unit]] })
   end
 
   def product_costing_params
@@ -100,33 +105,38 @@ class ProductsController < ApplicationController
   end
 
   def insert_ingredients
-    ingredient_params.each do |material|
+    ingredient_params[:ingredients].each_value do |material|
       new = Ingredient.create!(product_id: @product.id, material_id: material['id'])
       insert_ingredient_costing(new.id, material['quantity'], material['cost_per_unit'])
     end
   end
 
   def update_ingredient
+    # Get all existing ingredients for this product
     existing = Ingredient.where(product_id: @product.id).includes(:ingredient_costing)
     existing_map = existing.index_by(&:material_id)
-    param_ids = ingredient_params.map { |m| m['id'].to_i }
+
+    # Get the submitted ingredient IDs as integers
+    param_ingredients = ingredient_params[:ingredients] || {}
+    param_ids = param_ingredients.values.map { |m| m['id'].to_i }
 
     # Remove ingredients not in params
     (existing_map.keys - param_ids).each do |material_id|
       ing = existing_map[material_id]
-      ing.presence&.destroy
+      ing&.destroy
     end
 
-    ingredient_params.each do |material|
+    # Add or update ingredients
+    param_ingredients.each_value do |material|
       mat_id = material['id'].to_i
-      qty = material['quantity']
-      cost_per_unit = material['cost_per_unit']
+      qty = material['quantity'].to_f
+      cost_per_unit = material['cost_per_unit'].to_f
 
       if existing_map[mat_id]
         # Update quantity if changed
         costing = existing_map[mat_id].ingredient_costing
-        if costing && costing.quantity.to_s != qty.to_s
-          costing.update(quantity: qty, ingredient_total_cost: qty.to_f * cost_per_unit.to_f)
+        if costing && costing.quantity.to_f != qty
+          costing.update(quantity: qty, ingredient_total_cost: qty * cost_per_unit)
         end
       else
         # Add new ingredient
