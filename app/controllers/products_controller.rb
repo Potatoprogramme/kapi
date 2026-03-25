@@ -32,7 +32,7 @@ class ProductsController < ApplicationController
     # render json: { product_params: product_params, ingredient_params: ingredient_params }
     insert_product
     redirect_to products_path, notice: t('.success')
-  rescue ActiveRecord::RecordInvalid => e
+  rescue StandardError => e
     load_form_data
     @product.errors.add(:ingredients, 'cannot be empty') unless params[:product].key?('ingredients')
     flash.now[:alert] = e.message

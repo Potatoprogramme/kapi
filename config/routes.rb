@@ -21,5 +21,7 @@ Rails.application.routes.draw do
   resources :products
   resources :product_categories
   resources :orders
+
+  patch 'complete_order/:id', to: 'orders#complete_order'
   get '/', to: 'home#index'
 end
