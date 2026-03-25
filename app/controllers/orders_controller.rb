@@ -2,7 +2,7 @@
 
 class OrdersController < ApplicationController
   def index
-    load_data
+    load_data(params[:tab])
   end
 
   def create
@@ -15,7 +15,13 @@ class OrdersController < ApplicationController
   end
 
   def complete_order
-    Order.update(status: :completed).where(params: [:id])
+    Order.where(id: params[:id]).update(status: :completed)
+    redirect_to orders_path, notice: t('.success')
+  end
+
+  def void_order
+    Order.where(id: params[:id]).update(status: :voided)
+    redirect_to orders_path, notice: t('.success')
   end
 
   private
@@ -49,13 +55,14 @@ class OrdersController < ApplicationController
                       item_name: product.name, quantity: quantity, item_total_cost: item_total_cost)
   end
 
-  def load_data
+  def load_data(tab = 'pending')
     # For Product Options
     @products = Product.active.left_joins(:product_costing,
                                           :product_category)
                        .select('products.*, product_costings.selling_price,
                        product_categories.name as category_name, product_categories.id as category_id')
     # For Listing Orders
-    @orders = Order.order(id: :desc)
+    status = %w[pending completed voided].include?(tab) ? tab : 'pending'
+    @orders = Order.where(status: status).order(id: :desc)
   end
 end

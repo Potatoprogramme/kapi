@@ -60,3 +60,5 @@ en:
     create:
       success: "Order created successfully."
       failure: "Failed to create order."
+    complete_order:
+      success: "Updated successfully"

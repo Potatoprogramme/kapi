@@ -39,10 +39,10 @@
               <span class="text-green-700 uppercase font-bold"><%= order.payment_method %></span>
             </div>
           </div>
-          <div class="flex items-end justify-between mt-2 h-full">
+          <div class="flex items-end justify-around">
             <% if order.status == 'pending' %>
-              <% link_to 'Complete', complete_order_path(order), method: :patch, class: 'text-green-600 hover:underline text-xs font-bold' %>
-              <% link_to 'Void', void_order_path(order), method: :patch, class: 'text-red-500 hover:underline text-xs font-bold' %>
+              <%= link_to 'Complete', complete_order_path(order), data: { turbo_method: :patch}, class: 'text-green-600 hover:underline text-xs font-bold' %>
+              <%= link_to 'Void', void_order_path(order), data: { turbo_method: :patch}, class: 'text-red-500 hover:underline text-xs font-bold' %>
             <% end %>
           </div>
         </div>
