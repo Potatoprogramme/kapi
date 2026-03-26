@@ -8,10 +8,11 @@ class ProductsController < ApplicationController
   end
 
   def show
-    @product = Product.left_joins(:product_costing, :product_category)
+    @product = Product.left_joins(:product_costing, :product_category, :user)
                       .where(id: @product.id)
                       .select('products.*, product_costings.*,
-                      product_categories.name as category_name, product_categories.description')
+                      product_categories.name as category_name,
+                      product_categories.description, users.email_address')
                       .first
     @ingredients = Ingredient.where(product_id: @product.product_id)
                              .left_joins(:material, :ingredient_costing).select('*')

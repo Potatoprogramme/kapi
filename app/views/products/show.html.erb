@@ -4,6 +4,7 @@
     <% product = @product.is_a?(ActiveRecord::Relation) ? @product.first : @product %>
     <div class="bg-white/80 rounded-3xl border border-amber-100 shadow-xl mb-4 p-6">
       <h1 class="text-2xl font-black text-amber-900"><%= product.name %></h1>
+      <p class="text-xs text-amber-400 mt-1">Created by: <%= product.email_address %></p>
       <p class="text-xs text-amber-400 mt-1">ID #<%= product.id %> · Added <%= product.created_at.strftime("%b %d, %Y") %></p>
       <p class="text-xs text-amber-900 font-semibold mb-0.5">Category: <%= product&.category_name %></p>
       <p class="text-xs text-amber-500 font-semibold mb-0.5">Category Description: <%= product&.description %></p>
