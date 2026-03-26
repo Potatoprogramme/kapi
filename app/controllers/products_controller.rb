@@ -109,9 +109,9 @@ class ProductsController < ApplicationController
   end
 
   def insert_ingredients
-    ingredient_params[:ingredients].each_value do |material|
-      new = Ingredient.create!(product_id: @product.id, material_id: material['id'], user_id: Current.user.id)
-      insert_ingredient_costing(new.id, material['quantity'], material['cost_per_unit'])
+    ingredient_params[:ingredients].each_value do |ingredient|
+      new = Ingredient.create!(product_id: @product.id, material_id: ingredient['id'], user_id: Current.user.id)
+      insert_ingredient_costing(new.id, ingredient['quantity'], ingredient['cost_per_unit'])
     end
   end
 
