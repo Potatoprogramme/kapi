@@ -62,7 +62,7 @@ class OrdersController < ApplicationController
                        .select('products.*, product_costings.selling_price,
                        product_categories.name as category_name, product_categories.id as category_id')
     # For Listing Orders
-    status = %w[pending completed voided].include?(tab) ? tab : 'pending'
+    status = Order.statuses.keys.include?(tab) ? tab : 'pending'
     @orders = Order.where(status: status).order(id: :desc)
   end
 end
