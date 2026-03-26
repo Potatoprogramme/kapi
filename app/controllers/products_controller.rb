@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[show edit update destroy]
+  before_action :set_product, only: %i[show edit update soft_delete]
   allow_unauthenticated_access only: %i[index show]
   def index
-    @products = Product.active.left_joins(:product_costing,
-                                          :product_category)
-                       .select('products.*, product_costings.selling_price, product_categories.name as category_name')
+    load_products
   end
 
   def show
@@ -29,7 +27,6 @@ class ProductsController < ApplicationController
   end
 
   def create
-    # render json: { product_params: product_params, ingredient_params: ingredient_params }
     insert_product
     redirect_to products_path, notice: t('.success')
   rescue StandardError => e
@@ -49,9 +46,14 @@ class ProductsController < ApplicationController
     render :new, status: :unprocessable_content
   end
 
-  def destroy
-    soft_delete_product
-    redirect_to products_path, notice: t('.success')
+  def soft_delete
+    if @product.update(status: :deleted)
+      redirect_to products_path, notice: t('.success')
+    else
+      load_products
+      flash.now[:alert] = t('.failure')
+      render :index, status: :unprocessable_content
+    end
   end
 
   private
@@ -89,6 +91,7 @@ class ProductsController < ApplicationController
 
   def insert_product
     @product = Product.new(product_params)
+    @product.user_id = Current.user.id
     ActiveRecord::Base.transaction do
       @product.save!
       insert_ingredients
@@ -106,7 +109,7 @@ class ProductsController < ApplicationController
 
   def insert_ingredients
     ingredient_params[:ingredients].each_value do |material|
-      new = Ingredient.create!(product_id: @product.id, material_id: material['id'])
+      new = Ingredient.create!(product_id: @product.id, material_id: material['id'], user_id: Current.user.id)
       insert_ingredient_costing(new.id, material['quantity'], material['cost_per_unit'])
     end
   end
@@ -162,7 +165,9 @@ class ProductsController < ApplicationController
     product_costing.presence&.update(product_costing_params)
   end
 
-  def soft_delete_product
-    @product.update(status: :deleted)
+  def load_products
+    @products = Product.active.left_joins(:product_costing,
+                                          :product_category)
+                       .select('products.*, product_costings.selling_price, product_categories.name as category_name')
   end
 end

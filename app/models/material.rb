@@ -2,6 +2,7 @@
 
 class Material < ApplicationRecord
   VALID_UNITS = %w[grams ml pieces].freeze
+  belongs_to :user
   validates :name,  presence: true
   validates :cost,  presence: true
   validates :quantity, presence: true
@@ -15,6 +16,7 @@ class Material < ApplicationRecord
     expected = cost.to_f / quantity.to_f
     return unless (cost_per_unit.to_f - expected).abs > 0.001
 
-    errors.add(:cost_per_unit, 'must equal cost divided by quantity')
+    errors.add(:cost_per_unit, 'must equal cost divided by
+    quantity')
   end
 end

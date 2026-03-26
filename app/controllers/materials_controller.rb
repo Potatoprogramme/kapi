@@ -17,6 +17,7 @@ class MaterialsController < ApplicationController
 
   def create
     @material = Material.new(material_params)
+    @material.user_id = Current.user.id
     if @material.save
       redirect_to materials_path, notice: t('.success')
     else

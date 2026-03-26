@@ -36,8 +36,9 @@ en:
     update:
       success: "Product was successfully updated."
       failure: "Could not update product."
-    destroy:
+    soft_delete:
       success: "Product was successfully deleted."
+      failure: "Failed to delete product."
   materials:
     create:
       success: "Material was successfully created."

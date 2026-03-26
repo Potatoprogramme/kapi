@@ -18,7 +18,11 @@ Rails.application.routes.draw do
   root 'home#index'
 
   resources :materials
-  resources :products
+  resources :products do
+    member do
+      patch :soft_delete
+    end
+  end
   resources :product_categories
   resources :orders
 
