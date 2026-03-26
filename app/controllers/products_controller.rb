@@ -143,7 +143,7 @@ class ProductsController < ApplicationController
         end
       else
         # Add new ingredient
-        new_ing = Ingredient.create!(product_id: @product.id, material_id: mat_id)
+        new_ing = Ingredient.create!(product_id: @product.id, material_id: mat_id, user_id: Current.user.id)
         insert_ingredient_costing(new_ing.id, qty, cost_per_unit)
       end
     end

@@ -54,6 +54,8 @@ en:
     create:
       success: "Category successfully created."
       failure: "Could not create category."
+    update:
+      success: "Category updated successfully."
     destroy:
       success: "Category successfully deleted."
       failure: "Failed to delete category."
