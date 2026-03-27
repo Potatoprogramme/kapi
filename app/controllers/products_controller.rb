@@ -72,7 +72,7 @@ class ProductsController < ApplicationController
   end
 
   def ingredient_params
-    params.expect(product: { ingredients: [%i[id quantity cost_per_unit]] })
+    params.expect(product: { ingredients: [%i[material_id quantity cost_per_unit]] })
   end
 
   def product_costing_params
@@ -110,7 +110,8 @@ class ProductsController < ApplicationController
 
   def insert_ingredients
     ingredient_params[:ingredients].each_value do |ingredient|
-      new = Ingredient.create!(product_id: @product.id, material_id: ingredient['id'], user_id: Current.user.id)
+      new = Ingredient.create!(product_id: @product.id, material_id: ingredient['material_id'],
+                               user_id: Current.user.id)
       insert_ingredient_costing(new.id, ingredient['quantity'], ingredient['cost_per_unit'])
     end
   end
