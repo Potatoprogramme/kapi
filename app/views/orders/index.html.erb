@@ -24,24 +24,26 @@
 						}[order.status] %>"><%= order.status.capitalize %></span>
           </div>
           <div class="flex items-center gap-3 mb-1">
-            <span class="font-black text-lg text-gray-800"><%= order.customer_name %></span>
             <span class="text-xs text-gray-400"><%= order.created_at.strftime('%b %d, %Y %I:%M%p') %></span>
           </div>
           <div class="text-sm text-gray-600 mb-2">
             <ul class="list-disc pl-5">
               <% order.order_items.each do |item| %>
-                <li><span class="font-semibold"><%= item.product.name %></span> × <%= item.quantity %></li>
+                <li class="flex justify-between "><span><span class="font-semibold"><%= item.product.name %></span> × <%= item.quantity %></span> <%= item.cost_per_item %> </li>
               <% end %>
             </ul>
           </div>
-          <div class="flex items-center justify-between mt-2">
+          <div class="flex items-end justify-between mt-2 h-full">
             <span class="font-bold text-amber-700">₱<%= number_with_precision(order.order_total, precision: 2) %></span>
             <div class="flex gap-2">
-              <% if order.status == 'pending' %>
-                <%= link_to 'Complete', complete_order_path(order), method: :patch, class: 'text-green-600 hover:underline text-xs font-bold' %>
-                <%= link_to 'Void', void_order_path(order), method: :patch, class: 'text-red-500 hover:underline text-xs font-bold' %>
-              <% end %>
+              <span class="text-green-700 uppercase font-bold"><%= order.payment_method %></span>
             </div>
+          </div>
+          <div class="flex items-end justify-around">
+            <% if order.status == 'pending' %>
+              <%= link_to 'Complete', complete_order_path(order), data: { turbo_method: :patch}, class: 'text-green-600 hover:underline text-xs font-bold' %>
+              <%= link_to 'Void', void_order_path(order), data: { turbo_method: :patch}, class: 'text-red-500 hover:underline text-xs font-bold' %>
+            <% end %>
           </div>
         </div>
       <% end %>
@@ -68,7 +70,7 @@
           </div>
           <h2 class="text-2xl font-black text-amber-700 mb-2">Select Items</h2>
           <p class="text-sm text-gray-500 mb-6">Choose products and set quantities.</p>
-          <%= form_with model: @order, url: orders_path, data: { turbo: false }, html: { id: 'order-form' }, method: :post do |f| %>
+          <%= form_with model: @orders, url: orders_path, html: { id: 'order-form' }, method: :post do |f| %>
             <% grouped_products = (@products || []).group_by { |p| p.product_category&.name || 'Uncategorized' } %>
             <% grouped_products.each do |category, products| %>
               <div class="mb-4">
@@ -77,8 +79,8 @@
                   <% products.each do |product| %>
                     <div class="border rounded-xl p-3 flex flex-col items-center product-select-card transition-all duration-200 hover:shadow-lg hover:border-amber-400 cursor-pointer" data-product-id="<%= product.id %>">
                       <button type="button" class="product-toggle-btn w-full px-3 py-2 rounded-lg font-bold text-amber-700 border border-amber-300 bg-amber-50 hover:bg-amber-100 mb-2 transition flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-amber-400"
-                      data-product-id="<%= product.id %>"
-                      data-product-price="<%= product.selling_price || 0 %>">
+                        data-product-id="<%= product.id %>"
+                        data-product-price="<%= product.selling_price || 0 %>">
                         <span><%= product.name %></span>
                         <span class="text-xs text-green-700 font-bold mt-1">₱<%= number_with_precision(product.selling_price, precision: 2) %></span>
                       </button>
@@ -150,8 +152,8 @@
           </button>
           <!-- GCash -->
           <button type="button"
-    class="payment-opt-btn flex items-center gap-4 p-4 border-2 border-amber-200 rounded-2xl hover:border-amber-400 transition-all duration-150 text-left"
-    data-value="gcash">
+              class="payment-opt-btn flex items-center gap-4 p-4 border-2 border-amber-200 rounded-2xl hover:border-amber-400 transition-all duration-150 text-left"
+              data-value="gcash">
             <span class="text-3xl">
               <%= image_tag 'gcash.png', class: 'h-6 inline' %>
             </span>
@@ -162,8 +164,8 @@
           </button>
           <!-- Maya -->
           <button type="button"
-    class="payment-opt-btn flex items-center gap-4 p-4 border-2 border-amber-200 rounded-2xl hover:border-amber-400 transition-all duration-150 text-left"
-    data-value="maya">
+            class="payment-opt-btn flex items-center gap-4 p-4 border-2 border-amber-200 rounded-2xl hover:border-amber-400 transition-all duration-150 text-left"
+            data-value="maya">
             <span class="text-3xl">
               <%= image_tag 'Maya Logo.svg', class: 'h-6 inline' %>
             </span>

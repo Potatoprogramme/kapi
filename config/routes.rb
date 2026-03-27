@@ -18,8 +18,15 @@ Rails.application.routes.draw do
   root 'home#index'
 
   resources :materials
-  resources :products
+  resources :products do
+    member do
+      patch :soft_delete
+    end
+  end
   resources :product_categories
   resources :orders
+
+  patch 'complete_order/:id', to: 'orders#complete_order', as: :complete_order
+  patch 'void_order/:id', to: 'orders#void_order', as: :void_order
   get '/', to: 'home#index'
 end

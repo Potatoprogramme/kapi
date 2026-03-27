@@ -14,6 +14,7 @@ class ProductCategoriesController < ApplicationController
 
   def create
     @category = ProductCategory.new(product_category_params)
+    @category.user_id = Current.user.id
     if @category.save
       redirect_to product_categories_path, notice: t('.success')
     else
@@ -23,7 +24,7 @@ class ProductCategoriesController < ApplicationController
 
   def update
     @category.update(product_category_params)
-    redirect_to product_category_path(@category)
+    redirect_to product_category_path(@category), notice: t('.success')
   end
 
   def destroy
