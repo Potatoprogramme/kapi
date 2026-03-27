@@ -123,7 +123,7 @@ class ProductsController < ApplicationController
 
     # Get the submitted ingredient IDs as integers
     param_ingredients = ingredient_params[:ingredients] || {}
-    param_ids = param_ingredients.values.map { |m| m['id'].to_i }
+    param_ids = param_ingredients.values.map { |m| m['material_id'].to_i }
 
     # Remove ingredients not in params
     (existing_map.keys - param_ids).each do |material_id|
@@ -133,7 +133,7 @@ class ProductsController < ApplicationController
 
     # Add or update ingredients
     param_ingredients.each_value do |material|
-      mat_id = material['id'].to_i
+      mat_id = material['material_id'].to_i
       qty = material['quantity'].to_f
       cost_per_unit = material['cost_per_unit'].to_f
 
