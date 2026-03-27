@@ -14,7 +14,7 @@ production:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
 development:
-  periodic_cleanup:
-    class: GuestsCleanupJob
-    queue: background
-    schedule: every 15 seconds
+  void_pending_orders:
+    class: VoidPendingOrderJob
+    queue: default
+    schedule: every 2 minutes
