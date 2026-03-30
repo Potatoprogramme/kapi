@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
-namespace API::KAPI::V1, defaults: { format: json } do
-  resources :materials
+namespace :api, defaults: { format: :json } do
+  namespace :kapi do
+    namespace :v1 do
+      resources :materials
+    end
+  end
 end

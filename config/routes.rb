@@ -24,9 +24,8 @@ Rails.application.routes.draw do
     end
   end
   resources :product_categories
-  resources :orders
+  resources :orders, except: %i[edit update destroy]
 
   patch 'complete_order/:id', to: 'orders#complete_order', as: :complete_order
   patch 'void_order/:id', to: 'orders#void_order', as: :void_order
-  get '/', to: 'home#index'
 end
