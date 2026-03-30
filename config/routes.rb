@@ -28,4 +28,7 @@ Rails.application.routes.draw do
 
   patch 'complete_order/:id', to: 'orders#complete_order', as: :complete_order
   patch 'void_order/:id', to: 'orders#void_order', as: :void_order
+
+  # API
+  draw :kapi_api_routes
 end
