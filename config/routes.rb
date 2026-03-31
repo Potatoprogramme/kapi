@@ -25,11 +25,13 @@ Rails.application.routes.draw do
     end
   end
   resources :product_categories
-  resources :orders, except: %i[edit update destroy]
+  resources :orders, except: %i[edit update destroy] do
+    member do
+      patch :complete
+      patch :void
+    end
+  end
 
-  patch 'complete_order/:id', to: 'orders#complete_order', as: :complete_order
-  patch 'void_order/:id', to: 'orders#void_order', as: :void_order
-
-  # API
+  # API routes
   draw :kapi_api_routes
 end

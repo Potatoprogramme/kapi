@@ -14,12 +14,12 @@ class OrdersController < ApplicationController
     render :index, status: :unprocessable_content
   end
 
-  def complete_order
+  def complete
     Order.where(id: params[:id]).update(status: :completed)
     redirect_to orders_path, notice: t('.success')
   end
 
-  def void_order
+  def void
     Order.where(id: params[:id]).update(status: :voided)
     redirect_to orders_path, notice: t('.success')
   end

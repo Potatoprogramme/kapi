@@ -67,7 +67,9 @@ en:
     create:
       success: "Order created successfully."
       failure: "Failed to create order."
-    complete_order:
-      success: "Updated successfully"
-    void_order:
+    complete:
+      success: "Order was completed successfully."
+      failure: "Failed to complete order."
+    void:
       success: "Order was voided successfully."
+      failure: "Failed to void order."
