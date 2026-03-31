@@ -29,6 +29,10 @@
 
 en:
   hello: "Hello world"
+  registrations:
+    create:
+      success: "User registered successfully."
+      failure: "Failed to register user."
   products:
     create:
       success: "Product was successfully created."
