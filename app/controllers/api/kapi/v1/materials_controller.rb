@@ -2,24 +2,39 @@
 
 module Api::Kapi::V1
   class MaterialsController < Api::Kapi::V1::ApiController
+    before_action :set_material, only: %i[update destroy]
     def index
       result = Api::Kapi::FetchMaterials.call
       if result.success?
         render :index, locals: { materials: result.materials }
       else
-        render json: { error: 'Failed to fetch materials' }, status: :unprocessable_content
+        render_error(status: :unprocessable_entity, message: result.error)
       end
     end
 
     def create
-      material = Material.new(name: material_params[:name], quantity: material_params[:quantity],
-                              cost: material_params[:cost], cost_per_unit: material_params[:cost_per_unit],
-                              unit: material_params[:unit],
-                              user_id: current_user.id)
-      if material.save
-        render json: material, status: :created
+      @material = Material.new(material_params.merge(user_id: current_user.id))
+      if @material.save
+        render :create, locals: { material: @material }, status: :created
       else
-        render json: { error: 'Failed to create material' }, status: :unprocessable_content
+        render_error(status: :unprocessable_content, message: 'Failed to create material',
+                     errors: @material.errors.to_hash)
+      end
+    end
+
+    def update
+      if @material.update(material_params)
+        render :update, status: :ok
+      else
+        render_unprocessable_content(@material.errors)
+      end
+    end
+
+    def destroy
+      if Ingredient.exists?(material_id: @material.id)
+        render :destroy, status: :ok
+      else
+        render_error
       end
     end
 

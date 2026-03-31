@@ -4,13 +4,17 @@ module Api
   module Jwtable
     extend ActiveSupport::Concern
 
+    included do
+      before_action :authenticate_user!
+    end
+
     def generate_token(user)
       JWT.encode({
                    user_id: user.id,
                    exp: 24.hours.from_now.to_i
                  },
                  ENV.fetch('SECRET_KEY_BASE', nil),
-                 algorithm: 'HS256')
+                 'HS256')
     end
 
     def decode_token(token)
@@ -18,6 +22,16 @@ module Api
       decoded_token[0]['user_id']
     rescue JWT::DecodeError
       nil
+    end
+
+    def current_user(header = request.headers['Authorization'])
+      token = header&.split&.last
+      user_id = decode_token(token)
+      User.find_by(id: user_id)
+    end
+
+    def authenticate_user!
+      render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user
     end
   end
 end
