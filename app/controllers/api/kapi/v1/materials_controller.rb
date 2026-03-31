@@ -15,7 +15,7 @@ module Api::Kapi::V1
       material = Material.new(name: material_params[:name], quantity: material_params[:quantity],
                               cost: material_params[:cost], cost_per_unit: material_params[:cost_per_unit],
                               unit: material_params[:unit],
-                              user_id: token)
+                              user_id: current_user.id)
       if material.save
         render json: material, status: :created
       else
