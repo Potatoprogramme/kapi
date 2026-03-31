@@ -29,6 +29,10 @@
 
 en:
   hello: "Hello world"
+  registrations:
+    create:
+      success: "User registered successfully."
+      failure: "Failed to register user."
   products:
     create:
       success: "Product was successfully created."
@@ -65,3 +69,5 @@ en:
       failure: "Failed to create order."
     complete_order:
       success: "Updated successfully"
+    void_order:
+      success: "Order was voided successfully."

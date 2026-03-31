@@ -18,6 +18,7 @@ class MaterialsController < ApplicationController
   def create
     @material = Material.new(material_params)
     @material.user_id = Current.user.id
+
     if @material.save
       redirect_to materials_path, notice: t('.success')
     else
@@ -46,7 +47,7 @@ class MaterialsController < ApplicationController
   private
 
   def material_params
-    params.expect(material: %i[name quantity cost grams cost_per_unit unit])
+    params.expect(material: %i[name quantity cost cost_per_unit unit])
   end
 
   def set_material
