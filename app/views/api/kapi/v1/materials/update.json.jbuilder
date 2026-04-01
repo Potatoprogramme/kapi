@@ -1,6 +1,4 @@
 # frozen_string_literal: true
 
 json.message 'Updated Successfully'
-json.array material do
-  json.partial! 'api/kapi/v1/materials/material', material: material
-end
+json.partial! 'api/kapi/v1/materials/material', material: material
