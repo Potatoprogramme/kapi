@@ -4,10 +4,6 @@ module Api
   module Jwtable
     extend ActiveSupport::Concern
 
-    included do
-      before_action :authenticate_user!
-    end
-
     def generate_token(user)
       JWT.encode({
                    user_id: user.id,

@@ -3,6 +3,7 @@
 module Api::Kapi::V1
   class MaterialsController < Api::Kapi::V1::ApiController
     before_action :set_material, only: %i[update destroy]
+    before_action :authenticate_user!, except: %i[index]
     def index
       result = Api::Kapi::FetchMaterials.call
       if result.success?
