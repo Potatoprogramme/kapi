@@ -111,16 +111,16 @@ class ProductsController < ApplicationController
 
   def update_product
     ActiveRecord::Base.transaction do
-      @product.update(product_params)
+      @product.update!(product_params)
       update_ingredient
       update_product_costing(@product.id)
     end
     redirect_to products_path, notice: t('.success')
-  rescue StandardError => e
+  rescue ActiveRecord::RecordInvalid => e
     load_form_data(@product.id)
-    @product.errors.add(:ingredients, 'cannot be empty') unless params[:product].key?('ingredients')
+    @product.errors.add(:ingredients, 'cannot be empty') unless params[:product]&.key?('ingredients')
     flash.now[:alert] = e.message
-    render :new, status: :unprocessable_content
+    render :edit, status: :unprocessable_content
   end
 
   def update_ingredient
@@ -169,7 +169,7 @@ class ProductsController < ApplicationController
     return unless costing && costing.quantity.to_f != quantity
 
     total_cost = (quantity * cost_per_unit).round(3)
-    costing.update(quantity: quantity, ingredient_total_cost: total_cost)
+    costing.update!(quantity: quantity, ingredient_total_cost: total_cost)
   end
 
   def create_new_ingredient_with_costing(material_id, quantity, cost_per_unit)

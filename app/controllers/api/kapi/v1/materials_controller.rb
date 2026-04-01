@@ -32,9 +32,10 @@ module Api::Kapi::V1
 
     def destroy
       if Ingredient.exists?(material_id: @material.id)
-        render :destroy, status: :ok
+        render_error(status: :unprocessable_content, message: 'Material is currently used')
       else
-        render_error
+        @material.destroy
+        render :destroy, status: :ok
       end
     end
 
