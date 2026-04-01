@@ -24,7 +24,7 @@ module Api::Kapi::V1
 
     def update
       if @material.update(material_params)
-        render :update, status: :ok
+        render :update, locals: { material: @material }, status: :ok
       else
         render_unprocessable_content(@material.errors)
       end
