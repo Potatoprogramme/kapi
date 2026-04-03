@@ -16,7 +16,7 @@ module Api
     private
 
     def render_error(status:, message:, errors: nil, meta: nil)
-      payload = { success: false, error: { message: message } }
+      payload = { error: { message: message } }
       payload[:error][:errors] = errors if errors.present?
       payload[:meta] = meta if meta.present?
       render json: payload, status: status
@@ -49,6 +49,10 @@ module Api
     def render_internal_server_error(exception)
       Rails.logger.error(exception)
       render_error(status: :internal_server_error, message: 'Internal server error')
+    end
+
+    def render_unauthorized_access
+      render_error(status: :unauthorized, message: 'unauthorized')
     end
   end
 end

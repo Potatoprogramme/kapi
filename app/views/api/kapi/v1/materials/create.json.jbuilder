@@ -1,2 +1,6 @@
+# frozen_string_literal: true
+
 json.message 'Material created successfully'
-json.partial! 'api/kapi/v1/materials/material', material: material
+json.data do
+  json.partial! 'api/kapi/v1/materials/material', material: @material
+end

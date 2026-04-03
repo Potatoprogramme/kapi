@@ -5,35 +5,24 @@ module Api::Kapi::V1
     before_action :set_material, only: %i[update destroy]
     before_action :authenticate_user!, except: %i[index]
     def index
-      result = Api::Kapi::FetchMaterials.call
-      if result.success?
-        render :index, locals: { materials: result.materials }
-      else
-        render_error(status: :unprocessable_entity, message: result.error)
-      end
+      @materials = Material.order(id: :asc)
+      render :index, status: :ok
     end
 
     def create
       @material = Material.new(material_params.merge(user_id: current_user.id))
-      if @material.save
-        render :create, locals: { material: @material }, status: :created
-      else
-        render_error(status: :unprocessable_content, message: 'Failed to create material',
-                     errors: @material.errors.to_hash)
-      end
+      @material.save!
+      render :create, status: :created
     end
 
     def update
-      if @material.update(material_params)
-        render :update, locals: { material: @material }, status: :ok
-      else
-        render_unprocessable_content(@material.errors)
-      end
+      @material.update!(material_params)
+      render :update, status: :ok
     end
 
     def destroy
       if Ingredient.exists?(material_id: @material.id)
-        render_error(status: :unprocessable_content, message: 'Material is currently used')
+        render_error(status: :conflict, message: 'Material is currently used in a product')
       else
         @material.destroy
         render :destroy, status: :ok
