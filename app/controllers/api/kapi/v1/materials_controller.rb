@@ -3,10 +3,15 @@
 module Api::Kapi::V1
   class MaterialsController < Api::Kapi::V1::ApiController
     before_action :set_material, only: %i[update destroy]
-    before_action :authenticate_user!, except: %i[index]
+    before_action :authenticate_user!, except: %i[index show]
     def index
-      @materials = Material.order(id: :asc)
+      @materials = Material.order(id: :desc)
       render :index, status: :ok
+    end
+
+    def show
+      @material = Material.find(params[:id])
+      render :show, status: :ok
     end
 
     def create
