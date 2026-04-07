@@ -12,6 +12,13 @@ module Api
       }
     end
 
+    def decode_token(token)
+      decoded = JWT.decode(token, jwt_secret, true, decode_options)
+      decoded[0]
+    rescue JWT::DecodeError, JWT::ExpiredSignature, JWT::InvalidAudError
+      nil
+    end
+
     def access_token(user)
       JWT.encode({
                    user_id: user.id,
@@ -37,13 +44,6 @@ module Api
                  ALGORITHM)
     end
 
-    def decode_token(token)
-      decoded = JWT.decode(token, jwt_secret, true, decode_options)
-      decoded[0]
-    rescue JWT::DecodeError, JWT::ExpiredSignature, JWT::InvalidAudError
-      nil
-    end
-
     def current_user(header = request.headers['Authorization'])
       token = header&.split&.last
       payload = decode_token(token)
@@ -58,16 +58,17 @@ module Api
 
     def refresh_access_token
       token = cookies[:refresh_token]
-      payload, = JWT.decode(token, jwt_secret, true, decode_options)
+      return nil if token.blank?
 
-      return render_error(status: :unauthorized, message: 'Invalid refresh token') if payload['type'] != 'refresh'
+      payload, = JWT.decode(token, jwt_secret, true, decode_options)
+      return nil unless payload['type'] == 'refresh'
 
       user = User.find_by(id: payload['user_id'])
-      return render_error(status: :unauthorized, message: 'Invalid refresh token') unless user
+      return nil unless user
 
-      render json: { access_token: access_token(user) }, status: :ok
+      access_token(user)
     rescue JWT::DecodeError, JWT::ExpiredSignature, JWT::InvalidAudError
-      render_error(status: :unauthorized, message: 'Invalid refresh token')
+      nil
     end
 
     private
