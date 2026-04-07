@@ -18,7 +18,7 @@ module Api
                    type: 'access',
                    sub: user.email_address,
                    iat: Time.current.to_i,
-                   exp: 1.minute.from_now.to_i,
+                   exp: 60.minutes.from_now.to_i,
                    aud: 'http://api.kapi.com'
                  },
                  jwt_secret,
@@ -47,6 +47,8 @@ module Api
     def current_user(header = request.headers['Authorization'])
       token = header&.split&.last
       payload = decode_token(token)
+      return render_error(status: :unauthorized, message: 'Invalid token') unless payload['type'] == 'access'
+
       User.find_by(id: payload['user_id']) if payload&.key?('user_id')
     end
 

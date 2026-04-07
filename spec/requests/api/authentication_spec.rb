@@ -11,7 +11,8 @@ RSpec.describe 'Api::Kapi::V1::Authentication' do
         post '/api/kapi/v1/auth/login', params: { user: { email_address: user.email_address,
                                                           password: user.password } }, as: :json
         expect(response).to have_http_status(:ok)
-        expect(response.parsed_body['token']).to be_present
+        expect(response.parsed_body['access_token']).to be_present
+        expect(response.parsed_body['refresh_token']).to be_present
       end
     end
 
