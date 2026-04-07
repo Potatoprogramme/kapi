@@ -4,10 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Api::Kapi::V1::Authentication' do
   let(:user) { create(:user) }
-
-  def api_base
-    '/api/kapi/v1/auth'
-  end
+  let(:api_base) { '/api/kapi/v1/auth' }
 
   def login_user
     post "#{api_base}/login", params: { user: { email_address: user.email_address,
