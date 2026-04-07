@@ -6,7 +6,7 @@ module Api::Authentication
   def validate_login
     user = User.find_by(email_address: user_params[:email_address])
     if user&.authenticate(user_params[:password])
-      @token = generate_token(user)
+      @tokens = generate_tokens(user)
       render :token, status: :ok
     else
       render_error(status: :unauthorized, message: 'Invalid Email or Password')

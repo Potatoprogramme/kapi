@@ -4,21 +4,39 @@ module Api
   module Jwtable
     extend ActiveSupport::Concern
 
-    def generate_token(user)
+    ALGORITHM = 'HS256'
+    def generate_tokens(user)
+      {
+        access_token: access_token(user),
+        refresh_token: refresh_token(user)
+      }
+    end
+
+    def access_token(user)
       JWT.encode({
-                   user_id: user.id,
+                   access_token: user.id,
                    sub: user.email_address,
                    iat: Time.current.to_i,
-                   exp: 60.minutes.from_now.to_i,
+                   exp: 15.minutes.from_now.to_i,
                    aud: 'http://api.kapi.com'
                  },
                  jwt_secret,
-                 'HS256')
+                 ALGORITHM)
+    end
+
+    def refresh_token(user)
+      JWT.encode({
+                   refresh_token: user.id,
+                   exp: 7.days.from_now.to_i,
+                   aud: 'http://api.kapi.com'
+                 },
+                 jwt_secret,
+                 ALGORITHM)
     end
 
     def decode_token(token)
       payload, = JWT.decode(token, jwt_secret, true, decode_options)
-      payload['user_id']
+      payload['access_token'] || payload['refresh_token']
     rescue JWT::DecodeError, JWT::ExpiredSignature, JWT::InvalidAudError
       nil
     end
@@ -41,7 +59,7 @@ module Api
 
     def decode_options
       {
-        algorithm: 'HS256',
+        algorithm: ALGORITHM,
         verify_aud: true,
         aud: jwt_audience
       }
