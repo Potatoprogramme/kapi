@@ -57,7 +57,7 @@ module Api
     end
 
     def refresh_access_token
-      token = params[:refresh_token]
+      token = cookies[:refresh_token]
       payload, = JWT.decode(token, jwt_secret, true, decode_options)
 
       return render_error(status: :unauthorized, message: 'Invalid refresh token') if payload['type'] != 'refresh'
