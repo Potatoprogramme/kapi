@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Api::Kapi::V1::Authentication' do
+RSpec.describe 'Api::Kapi::V1::Authentication', type: :request do
   let(:user) { create(:user) }
   let(:api_base) { '/api/kapi/v1/auth' }
 

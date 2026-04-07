@@ -47,7 +47,7 @@ module Api
     def current_user(header = request.headers['Authorization'])
       token = header&.split&.last
       payload = decode_token(token)
-      return render_error(status: :unauthorized, message: 'Invalid token') unless payload['type'] == 'access'
+      return render_error(status: :unauthorized, message: 'Invalid token') unless payload&.[]('type') == 'access'
 
       User.find_by(id: payload['user_id']) if payload&.key?('user_id')
     end
