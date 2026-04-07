@@ -5,9 +5,13 @@ require 'rails_helper'
 RSpec.describe 'Api::Kapi::V1::Authentication' do
   let(:user) { create(:user) }
 
+  def api_base
+    '/api/kapi/v1/auth'
+  end
+
   def login_user
-    post '/api/kapi/v1/auth/login', params: { user: { email_address: user.email_address,
-                                                      password: user.password } }, as: :json
+    post "#{api_base}/login", params: { user: { email_address: user.email_address,
+                                                password: user.password } }, as: :json
   end
 
   describe 'POST /api/kapi/v1/auth/login' do
@@ -23,8 +27,8 @@ RSpec.describe 'Api::Kapi::V1::Authentication' do
 
     context 'user tries to login with wrong credentials' do
       it 'returns unauthorized access' do
-        post '/api/kapi/v1/auth/login', params: { user: { email_address: user.email_address,
-                                                          password: nil } }, as: :json
+        post "#{api_base}/login", params: { user: { email_address: user.email_address,
+                                                    password: nil } }, as: :json
         expect(response).to have_http_status(:unauthorized)
       end
     end
@@ -39,7 +43,7 @@ RSpec.describe 'Api::Kapi::V1::Authentication' do
       end
 
       it 'returns success and a new access token' do
-        post '/api/kapi/v1/auth/refresh', headers: {
+        post "#{api_base}/refresh", headers: {
           'Cookie' => "refresh_token=#{@refresh_token}"
         }, as: :json
 
@@ -50,7 +54,7 @@ RSpec.describe 'Api::Kapi::V1::Authentication' do
 
     context 'when refresh token is not provided' do
       it 'should return unauthorized' do
-        post '/api/kapi/v1/auth/refresh', as: :json
+        post "#{api_base}/refresh", as: :json
 
         expect(response).to have_http_status(:unauthorized)
       end
@@ -66,7 +70,7 @@ RSpec.describe 'Api::Kapi::V1::Authentication' do
       end
 
       it 'returns success and clears the refresh token cookie' do
-        post '/api/kapi/v1/auth/logout',
+        post "#{api_base}/logout",
              headers: {
                'Cookie' => "refresh_token=#{@refresh_token}"
              },
@@ -78,7 +82,7 @@ RSpec.describe 'Api::Kapi::V1::Authentication' do
 
     context 'when refresh token is not provided' do
       it 'should return unauthorized' do
-        post '/api/kapi/v1/auth/logout', as: :json
+        post "#{api_base}/logout", as: :json
 
         expect(response).to have_http_status(:unauthorized)
       end
