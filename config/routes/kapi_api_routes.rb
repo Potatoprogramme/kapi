@@ -3,8 +3,11 @@
 namespace :api, default: { format: :json } do
   namespace :kapi do
     namespace :v1 do
-      post 'auth/login', to: 'authentication#login'
-      post 'auth/logout', to: 'authentication#logout'
+      scope :auth, controller: 'authentication' do
+        post 'login', to: 'login'
+        post 'logout', to: 'logout'
+        post 'refresh', to: 'refresh'
+      end
       post 'register/user', to: 'registration#create'
       resources :materials, only: %i[index show create update destroy]
     end
