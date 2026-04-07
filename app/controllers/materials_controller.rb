@@ -4,7 +4,7 @@ class MaterialsController < ApplicationController
   before_action :set_material, only: %i[show edit update destroy]
   allow_unauthenticated_access only: %i[index show]
   def index
-    @materials = Material.all
+    @materials = Material.order(name: :asc)
   end
 
   def show; end
