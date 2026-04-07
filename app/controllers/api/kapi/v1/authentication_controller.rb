@@ -5,5 +5,9 @@ module Api::Kapi::V1
     def login
       validate_login
     end
+
+    def logout
+      logout_user
+    end
   end
 end
