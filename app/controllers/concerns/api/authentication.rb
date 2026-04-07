@@ -13,7 +13,7 @@ module Api
     end
 
     def logout?
-      token = request.headers['Authorization']&.split&.last
+      token = cookies[:refresh_token]
       return false unless token
 
       cookies.delete(:refresh_token, httponly: true, secure: Rails.env.production?, same_site: :lax)
