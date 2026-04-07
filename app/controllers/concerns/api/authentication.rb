@@ -16,7 +16,6 @@ module Api::Authentication
   def logout_user
     token = request.headers['Authorization']&.split&.last
     if token
-      invalidate_token(token)
       render json: { message: 'Logged out successfully' }, status: :ok
     else
       render_error(status: :bad_request, message: 'No token provided')

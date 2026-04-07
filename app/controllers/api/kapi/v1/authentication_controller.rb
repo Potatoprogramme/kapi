@@ -9,5 +9,9 @@ module Api::Kapi::V1
     def logout
       logout_user
     end
+
+    def refresh
+      refresh_access_token
+    end
   end
 end

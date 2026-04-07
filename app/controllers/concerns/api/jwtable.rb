@@ -14,10 +14,11 @@ module Api
 
     def access_token(user)
       JWT.encode({
-                   access_token: user.id,
+                   user_id: user.id,
+                   type: 'access',
                    sub: user.email_address,
                    iat: Time.current.to_i,
-                   exp: 15.minutes.from_now.to_i,
+                   exp: 1.minute.from_now.to_i,
                    aud: 'http://api.kapi.com'
                  },
                  jwt_secret,
@@ -26,29 +27,45 @@ module Api
 
     def refresh_token(user)
       JWT.encode({
-                   refresh_token: user.id,
+                   user_id: user.id,
+                   type: 'refresh',
+                   iat: Time.current.to_i,
                    exp: 7.days.from_now.to_i,
-                   aud: 'http://api.kapi.com'
+                   aud: jwt_audience
                  },
                  jwt_secret,
                  ALGORITHM)
     end
 
     def decode_token(token)
-      payload, = JWT.decode(token, jwt_secret, true, decode_options)
-      payload['access_token'] || payload['refresh_token']
+      decoded = JWT.decode(token, jwt_secret, true, decode_options)
+      decoded[0]
     rescue JWT::DecodeError, JWT::ExpiredSignature, JWT::InvalidAudError
       nil
     end
 
     def current_user(header = request.headers['Authorization'])
       token = header&.split&.last
-      user_id = decode_token(token)
-      User.find_by(id: user_id)
+      payload = decode_token(token)
+      User.find_by(id: payload['user_id']) if payload&.key?('user_id')
     end
 
     def authenticate_user!
       render_unauthorized_access unless current_user
+    end
+
+    def refresh_access_token
+      token = params[:refresh_token]
+      payload, = JWT.decode(token, jwt_secret, true, decode_options)
+
+      return render_error(status: :unauthorized, message: 'Invalid refresh token') if payload['type'] != 'refresh'
+
+      user = User.find_by(id: payload['user_id'])
+      return render_error(status: :unauthorized, message: 'Invalid refresh token') unless user
+
+      render json: { access_token: access_token(user) }, status: :ok
+    rescue JWT::DecodeError, JWT::ExpiredSignature, JWT::InvalidAudError
+      render_error(status: :unauthorized, message: 'Invalid refresh token')
     end
 
     private

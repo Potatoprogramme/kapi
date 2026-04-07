@@ -1,3 +1,4 @@
 # frozen_string_literal: true
 
-json.token @tokens
+json.access_token @tokens[:access_token]
+json.refresh_token @tokens[:refresh_token]
