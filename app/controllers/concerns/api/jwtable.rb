@@ -9,10 +9,10 @@ module Api
                    user_id: user.id,
                    sub: user.email_address,
                    iat: Time.current.to_i,
-                   exp: 24.hours.from_now.to_i,
+                   exp: 60.minutes.from_now.to_i,
                    aud: 'http://api.kapi.com'
                  },
-                 ENV.fetch('SECRET_KEY_BASE', nil),
+                 jwt_secret,
                  'HS256')
     end
 
