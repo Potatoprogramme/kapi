@@ -2,5 +2,5 @@
 
 json.message 'Material created successfully'
 json.data do
-  json.partial! 'api/kapi/v1/materials/material', material: @material
+  json.partial! 'material', material: @material
 end
