@@ -1,7 +1,14 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-
+RSpec.shared_examples 'unauthorized user' do |request_call|
+  context 'when user is not authenticated' do
+    it 'returns unauthorized' do
+      instance_exec(&request_call)
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+end
 RSpec.describe 'Api::Kapi::V1::Materials', type: :request do
   let(:user) { create(:user) }
   let(:api_base) { '/api/kapi/v1/materials' }
@@ -17,13 +24,16 @@ RSpec.describe 'Api::Kapi::V1::Materials', type: :request do
     @refresh_token = response.parsed_body['refresh_token']
   end
 
+  # index
   describe 'GET /api/kapi/v1/materials' do
     it 'returns a list of materials' do
       get api_base, as: :json
       expect(response).to have_http_status(:ok)
+      expect(response.parsed_body['total']).to eql(1)
     end
   end
 
+  # show
   describe 'GET /api/kapi/v1/materials/:id' do
     it 'returns a specific material' do
       get "#{api_base}/#{material.id}", as: :json
@@ -32,9 +42,10 @@ RSpec.describe 'Api::Kapi::V1::Materials', type: :request do
     end
   end
 
+  # create
   describe 'POST /api/kapi/v1/materials' do
     context 'when user is authenticated' do
-      context 'with valid parameters' do
+      context 'with valid material parameters' do
         it 'creates a new material' do
           post api_base, headers: { 'Authorization' => "Bearer #{@access_token}" },
                          params: { material: valid_attributes }, as: :json
@@ -50,10 +61,24 @@ RSpec.describe 'Api::Kapi::V1::Materials', type: :request do
         end
       end
     end
-    context 'when user is not authenticated' do
-      it 'returns unauthorized' do
-        post api_base, params: { material: valid_attributes }, as: :json
-        expect(response).to have_http_status(:unauthorized)
+    it_behaves_like 'unauthorized user', lambda {
+      post api_base, params: { material: valid_attributes }, as: :json
+    }
+  end
+
+  # update
+  describe 'PATCH /api/kapi/v1/materials/:id' do
+    context 'when user is authenticated' do
+      context 'with valid material parameters' do
+        it 'returns success and updated material' do
+          update_attributes = attributes_for(:material).merge(name: 'New material name')
+
+          patch "#{api_base}/#{material.id}", headers: { 'Authorization' => "Bearer #{@access_token}" },
+                                              params: { material: update_attributes }, as: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body['data']['id']).to eq(material.id)
+          expect(response.parsed_body['data']['name']).to eq('New material name')
+        end
       end
     end
   end
