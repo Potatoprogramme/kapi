@@ -22,7 +22,7 @@ RSpec.describe 'Api::Kapi::V1::Authentication', type: :request do
       end
     end
 
-    context 'user tries to login with wrong credentials' do
+    context 'with invalid credentials' do
       it 'returns unauthorized access' do
         post "#{api_base}/login", params: { user: { email_address: user.email_address,
                                                     password: nil } }, as: :json
