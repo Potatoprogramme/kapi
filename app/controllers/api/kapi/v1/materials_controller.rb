@@ -2,7 +2,7 @@
 
 module Api::Kapi::V1
   class MaterialsController < Api::Kapi::V1::ApiController
-    before_action :set_material, only: %i[update destroy]
+    before_action :set_material, only: %i[show update destroy]
     before_action :authenticate_user!, except: %i[index show]
     def index
       @materials = Material.order(id: :desc)
@@ -10,7 +10,6 @@ module Api::Kapi::V1
     end
 
     def show
-      @material = Material.find(params[:id])
       render :show, status: :ok
     end
 
