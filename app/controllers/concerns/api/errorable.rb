@@ -29,7 +29,7 @@ module Api
     def render_unprocessable_content(exception)
       render_error(
         status: :unprocessable_entity,
-        message: exception.record.errors.full_messages.first || exception.message,
+        message: exception.record.errors.full_messages.to_sentence || exception.message,
         errors: exception.record&.errors&.to_hash
       )
     end
