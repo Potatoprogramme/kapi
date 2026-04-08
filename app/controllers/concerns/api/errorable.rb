@@ -9,6 +9,7 @@ module Api
       rescue_from ActiveRecord::RecordInvalid, with: :render_unprocessable_content
       rescue_from ActiveRecord::RecordNotUnique, with: :render_conflict
       rescue_from ActionController::ParameterMissing, with: :render_bad_request
+      rescue_from ActiveRecord::RecordNotDestroyed, with: :render_not_destroyed
       rescue_from Pundit::NotAuthorizedError, with: :render_forbidden if defined?(Pundit)
       rescue_from StandardError, with: :render_internal_server_error unless Rails.env.local?
     end
@@ -53,6 +54,10 @@ module Api
 
     def render_unauthorized_access
       render_error(status: :unauthorized, message: 'unauthorized')
+    end
+
+    def render_not_destroyed(exception)
+      render_error(status: :conflict, message: exception.message)
     end
   end
 end
