@@ -2,8 +2,7 @@
 
 FactoryBot.define do
   factory :product_category do
-    name { 'MyString' }
-    description { 'MyString' }
-    color { 'MyString' }
+    name { Faker::Name }
+    description { 'some description' }
   end
 end
