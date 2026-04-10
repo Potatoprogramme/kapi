@@ -111,7 +111,6 @@ RSpec.describe 'Api::Kapi::V1::Materials', type: :request do
     }
   end
 
-  # delete
   describe 'DEL /api/kapi/v1/materials/:id' do
     context 'when user is authenticated' do
       it 'returns success if valid material id' do
