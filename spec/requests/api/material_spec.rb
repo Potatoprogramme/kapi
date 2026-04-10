@@ -38,7 +38,7 @@ RSpec.describe 'Api::Kapi::V1::Materials', type: :request do
       get api_base, as: :json
 
       expect(response).to have_http_status(:ok)
-      expect(response.parsed_body['total']).to eql(1)
+      expect(response.parsed_body['total']).to eq(1)
     end
   end
 
