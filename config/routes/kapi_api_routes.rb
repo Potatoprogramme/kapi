@@ -11,6 +11,7 @@ namespace :api, default: { format: :json } do
       post 'register/user', to: 'registration#create'
       resources :materials, only: %i[index show create update destroy]
       resources :product_categories, only: %i[index show create update destroy]
+      resources :products
     end
   end
 end
