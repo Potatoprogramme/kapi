@@ -5,3 +5,4 @@ json.categories do
     json.partial! 'category', category: category
   end
 end
+json.total @categories.count
