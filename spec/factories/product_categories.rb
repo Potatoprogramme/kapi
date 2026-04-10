@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :product_category do
-    name { Faker::Name }
+    name { Faker::Coffee.origin }
     description { 'some description' }
   end
 end
