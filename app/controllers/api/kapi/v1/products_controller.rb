@@ -2,7 +2,7 @@
 
 module Api::Kapi::V1
   class ProductsController < Api::Kapi::V1::ApiController
-    before_action :set_product, only: %i[show destroy]
+    before_action :set_product, only: %i[show destroy hard_delete]
     before_action :authenticate_user!, except: %i[index show]
     def index
       @products = Product.active.order(name: :asc)
@@ -31,8 +31,8 @@ module Api::Kapi::V1
     end
 
     def hard_delete
-      @product.destroy!
-      render :hard_deleted, status: :ok
+      @product.destroy
+      render :hard_delete, status: :ok
     end
 
     private
