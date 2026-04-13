@@ -2,10 +2,10 @@
 
 module Api::Kapi::V1
   class ProductsController < Api::Kapi::V1::ApiController
-    before_action :set_product, only: %i[show]
+    before_action :set_product, only: %i[show destroy]
     before_action :authenticate_user!, except: %i[index show]
     def index
-      @products = Product.order(name: :asc)
+      @products = Product.active.order(name: :asc)
       render :index, status: :ok
     end
 
@@ -18,10 +18,21 @@ module Api::Kapi::V1
                                              product_costing_params: product_costing_params,
                                              user_id: current_user.id)
       if result.success?
+        @product = result.product
         render :create, status: :created
       else
         render_error(status: :unprocessable_content, message: 'Error saving', errors: result)
       end
+    end
+
+    def destroy
+      @product.update!(status: :deleted)
+      render :destroy, status: :ok
+    end
+
+    def hard_delete
+      @product.destroy!
+      render :hard_deleted, status: :ok
     end
 
     private
