@@ -15,13 +15,3 @@ if product.thumbnail.attached?
     json.filename product.thumbnail.filename
   end
 end
-
-if include_ingredients
-  json.ingredients do
-    product.ingredients.each do |ingredient|
-      json.set! ingredient.id do
-        json.partial! 'ingredient', ingredient: ingredient
-      end
-    end
-  end
-end
