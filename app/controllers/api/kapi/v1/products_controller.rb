@@ -37,11 +37,7 @@ module Api::Kapi::V1
                       :name,
                       :product_category_id,
                       :thumbnail,
-                      { ingredients: %i[
-                        material_id
-                        quantity
-                        cost_per_unit
-                      ] }
+                      { ingredients: [%i[material_id quantity cost_per_unit]] }
                     ])
     end
 
