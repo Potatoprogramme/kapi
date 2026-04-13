@@ -14,11 +14,9 @@ module Api::Kapi::V1
     end
 
     def create
-      result = Api::Kapi::CreateProduct.call(
-        product_params: product_params,
-        user_id: current_user.id
-        # product_costing_params: product_costing_params
-      )
+      result = Api::Kapi::CreateProduct.call(product_params: product_params,
+                                             product_costing_params: product_costing_params,
+                                             user_id: current_user.id)
       if result.success?
         render :create, status: :created
       else
