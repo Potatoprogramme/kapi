@@ -8,3 +8,20 @@ json.extract! product,
               :status,
               :created_at,
               :updated_at
+json.selling_price product.product_costing.selling_price.to_f
+if product.thumbnail.attached?
+  json.thumbnail do
+    json.url url_for(product.thumbnail)
+    json.filename product.thumbnail.filename
+  end
+end
+
+if include_ingredients
+  json.ingredients do
+    product.ingredients.each do |ingredient|
+      json.set! ingredient.id do
+        json.partial! 'ingredient', ingredient: ingredient
+      end
+    end
+  end
+end
