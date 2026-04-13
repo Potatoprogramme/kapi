@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+json.overhead_percentage product_costing.overhead_percentage.to_f
+json.profit_margin_percentage product_costing.profit_margin_percentage.to_f
+json.direct_cost product_costing.direct_cost.to_f
+json.overhead_cost product_costing.overhead_cost.to_f
+json.profit_margin_amount product_costing.profit_margin_amount.to_f
+json.total_cost product_costing.total_cost.to_f
+json.created_at product_costing.created_at
+json.updated_at product_costing.updated_at
