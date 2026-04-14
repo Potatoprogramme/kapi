@@ -10,14 +10,6 @@ module Api::Kapi::V1
       end
     end
 
-    def logout
-      if logout?
-        render json: { message: 'Logged out successfully' }, status: :ok
-      else
-        render_error(status: :unauthorized, message: 'Invalid refresh token')
-      end
-    end
-
     def refresh
       @access_token = refresh_access_token
       return render_error(status: :unauthorized, message: 'Invalid refresh token') unless @access_token
