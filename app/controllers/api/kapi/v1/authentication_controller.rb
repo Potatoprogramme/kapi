@@ -12,9 +12,7 @@ module Api::Kapi::V1
 
     def refresh
       @access_token = refresh_access_token
-      return render_error(status: :unauthorized, message: 'Invalid refresh token') unless @access_token
-
-      render :refresh_token, status: :ok
+      render_error(status: :unauthorized, message: 'Invalid refresh token') unless @access_token
     end
   end
 end
