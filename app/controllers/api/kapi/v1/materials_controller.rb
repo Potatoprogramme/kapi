@@ -6,12 +6,9 @@ module Api::Kapi::V1
     before_action :authenticate_user!, except: %i[index show]
     def index
       @materials = Material.order(id: :desc)
-      render :index, status: :ok
     end
 
-    def show
-      render :show, status: :ok
-    end
+    def show; end
 
     def create
       @material = Material.new(material_params.merge(user_id: current_user.id))
@@ -21,7 +18,6 @@ module Api::Kapi::V1
 
     def update
       @material.update!(material_params)
-      render :update, status: :ok
     end
 
     def destroy
@@ -29,7 +25,6 @@ module Api::Kapi::V1
         render_error(status: :conflict, message: 'Material is currently used in a product')
       else
         @material.destroy
-        render :destroy, status: :ok
       end
     end
 

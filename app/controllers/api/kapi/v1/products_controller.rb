@@ -2,7 +2,7 @@
 
 module Api::Kapi::V1
   class ProductsController < Api::Kapi::V1::ApiController
-    before_action :set_product, only: %i[show destroy hard_delete]
+    before_action :set_product, only: %i[show update destroy hard_delete]
     before_action :authenticate_user!, except: %i[index show]
     def index
       @products = Product.active.order(name: :asc)
@@ -23,6 +23,13 @@ module Api::Kapi::V1
       else
         render_error(status: :unprocessable_content, message: 'Error saving', errors: result)
       end
+    end
+
+    def update
+      @product.update!(name: product_params[:name],
+                       product_category_id: product_params[:product_category_id],
+                       thumbnail: product_params[:thumbnail])
+      render :update, status: :ok
     end
 
     def destroy

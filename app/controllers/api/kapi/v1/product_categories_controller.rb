@@ -6,11 +6,9 @@ module Api::Kapi::V1
     before_action :authenticate_user!, except: %i[index show]
     def index
       @categories = ProductCategory.order(id: :desc)
-      render :index, status: :ok
     end
 
     def show
-      render :show, status: :ok
     end
 
     def create
@@ -21,12 +19,10 @@ module Api::Kapi::V1
 
     def update
       @category.update!(category_params)
-      render :update, status: :ok
     end
 
     def destroy
       @category.destroy!
-      render :destroy, status: :ok
     end
 
     private
