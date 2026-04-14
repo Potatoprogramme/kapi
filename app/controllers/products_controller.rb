@@ -25,14 +25,9 @@ class ProductsController < ApplicationController
     if result.success?
       redirect_to products_path, notice: t('.success')
     else
-      # 1. Reload the data needed for the form (dropdowns, etc.)
       load_form_data
-
-      # 2. Add the error from the interactor to the model
-      # This makes it show up in your 'error_messages' partial in the view
-      @product.errors.add(:base, result.error) if result.error.present?
-
-      # 3. Render the form again with the errors
+      @product = result.product || Product.new(product_params)
+      @product.errors.add(:base, result.errors) if result.errors.present?
       render :new, status: :unprocessable_content
     end
   end
@@ -44,13 +39,13 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.expect(product: %i[name description thumbnail])
+    params.expect(product: %i[name product_category_id description thumbnail])
   end
 
   def ingredient_create_params
     params.expect(product: {
                     ingredients: [{ to_create: [%i[material_id quantity cost_per_unit]] }]
-                  })
+                  })[:ingredients][:to_create]
   end
 
   def product_costing_params

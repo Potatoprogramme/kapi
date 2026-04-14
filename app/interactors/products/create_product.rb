@@ -12,7 +12,8 @@ module Products
       end
       context.product = @product
     rescue ActiveRecord::RecordInvalid => e
-      context.fail!(error: e.record.errors.full_messages.to_sentence)
+      context.product = @product || e.record
+      context.fail!(errors: e.record.errors.full_messages.to_sentence)
     end
 
     private
@@ -38,24 +39,22 @@ module Products
     end
 
     def create_ingredients!
-      ingredients = ingredient_params || []
-      ingredients&.each_value do |ing|
-        @ingredient = Ingredient.create!(material_id: ing['material_id'],
-                                         product_id: @product.id,
-                                         user_id: context.user_id)
-
-        create_ingredient_costing!(@ingredient.id, ing['quantity'], ing['cost_per_unit'])
+      ingredient_params&.each_value do |ing|
+        total_cost = (ing['quantity'].to_f * ing['cost_per_unit'].to_f).round(3)
+        @ingredient = Ingredient.create!(
+          material_id: ing['material_id'],
+          product_id: @product.id,
+          user_id: context.user_id,
+          quantity: ing['quantity'].to_f,
+          total_cost: total_cost
+        )
       end
-    end
-
-    def create_ingredient_costing!(ingredient_id, quantity, cost_per_unit)
-      total_cost = (quantity.to_f * cost_per_unit.to_f).round(3)
-      IngredientCosting.create!(ingredient_id: ingredient_id, quantity: quantity.to_f,
-                                ingredient_total_cost: total_cost)
     end
 
     def create_product_costing!
       ProductCosting.create!(product_costing_params.merge(product_id: @product.id))
     end
+
+    
   end
 end
