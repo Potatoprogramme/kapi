@@ -6,12 +6,9 @@ module Api::Kapi::V1
     before_action :authenticate_user!, except: %i[index show]
     def index
       @products = Product.active.order(name: :asc)
-      render :index, status: :ok
     end
 
-    def show
-      render :show, status: :ok
-    end
+    def show; end
 
     def create
       result = Api::Kapi::CreateProduct.call(product_params: product_params,
@@ -29,17 +26,14 @@ module Api::Kapi::V1
       @product.update!(name: product_params[:name],
                        product_category_id: product_params[:product_category_id],
                        thumbnail: product_params[:thumbnail])
-      render :update, status: :ok
     end
 
     def destroy
       @product.update!(status: :deleted)
-      render :destroy, status: :ok
     end
 
     def hard_delete
       @product.destroy
-      render :hard_delete, status: :ok
     end
 
     private
