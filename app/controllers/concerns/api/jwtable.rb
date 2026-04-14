@@ -25,7 +25,7 @@ module Api
                    type: 'access',
                    sub: user.email_address,
                    iat: Time.current.to_i,
-                   exp: 60.minutes.from_now.to_i,
+                   exp: 30.minutes.from_now.to_i,
                    aud: jwt_audience
                  },
                  jwt_secret,
