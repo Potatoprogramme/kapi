@@ -23,9 +23,13 @@ module Api::Kapi::V1
     end
 
     def update
-      @product.update!(name: product_params[:name],
-                       product_category_id: product_params[:product_category_id],
-                       thumbnail: product_params[:thumbnail])
+      result = Api::Kapi::UpdateProduct.call(
+        product_params: product_params,
+        product_costing_params: product_costing_params,
+        ingredient_delete_params: ingredient_delete_params,
+        ingredient_update_params: ingredient_update_params,
+        ingredient_create_params: ingredient_create_params
+      )
     end
 
     def destroy
@@ -48,6 +52,30 @@ module Api::Kapi::V1
                       :product_category_id,
                       :thumbnail,
                       { ingredients: [%i[material_id quantity cost_per_unit]] }
+                    ])
+    end
+
+    def ingredient_delete_params
+      params.expect(product: [
+                      { ingredients: [
+                        { to_delete: [] }
+                      ] }
+                    ])
+    end
+
+    def ingredient_update_params
+      params.expect(product: [
+                      { ingredients: [
+                        { to_update: [%i[ingredient_id quantity cost_per_unit]] }
+                      ] }
+                    ])
+    end
+
+    def ingredient_create_params
+      params.expect(product: [
+                      { ingredients: [
+                        { to_create: [%i[material_id quantity cost_per_unit]] }
+                      ] }
                     ])
     end
 
