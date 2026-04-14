@@ -8,8 +8,7 @@ module Api::Kapi::V1
       @categories = ProductCategory.order(id: :desc)
     end
 
-    def show
-    end
+    def show; end
 
     def create
       @category = ProductCategory.new(category_params.merge(user_id: current_user.id))

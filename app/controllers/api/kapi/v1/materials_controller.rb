@@ -24,7 +24,7 @@ module Api::Kapi::V1
       if Ingredient.exists?(material_id: @material.id)
         render_error(status: :conflict, message: 'Material is currently used in a product')
       else
-        @material.destroy
+        @material.destroy!
       end
     end
 
