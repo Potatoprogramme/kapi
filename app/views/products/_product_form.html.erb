@@ -53,7 +53,7 @@
       </div>
     <% end %>
     <%# Form %>
-    <%= form_with model: @product, multipart: true do |form| %>
+    <%= form_with model: @product, data: {turbo: false}, multipart: true do |form| %>
       <div class="bg-white/80 backdrop-blur-sm rounded-3xl border border-amber-100 shadow-xl shadow-amber-100/50 overflow-hidden">
         <%# Coffee Name %>
         <div class="p-6 border-b border-amber-50">
@@ -189,6 +189,7 @@
               </div>
             <% end %>
             <div id="ingDisplay" class="space-y-2"></div>
+            <div id="ingredient_payload_fields"></div>
           </div>
           <%# Costing Section %>
           <div class="p-6">
@@ -295,10 +296,10 @@
               </div>
             </div>
             <%# Hidden fields to persist costing values %>
-            <input type="hidden" id="direct_cost_field"         name="product[direct_cost]"               value="0">
-            <input type="hidden" id="overhead_cost_field"       name="product[overhead_cost]"             value="0">
-            <input type="hidden" id="total_cost_field"          name="product[total_cost]"                value="0">
-            <input type="hidden" id="profit_margin_cost_field"  name="product[profit_margin_amount]"      value="0">
+            <input type="hidden" id="direct_cost_field"         name="product[direct_cost]"               value="<%= @product_costing&.direct_cost || 0 %>">
+            <input type="hidden" id="overhead_cost_field"       name="product[overhead_cost]"             value="<%= @product_costing&.overhead_cost || 0 %>">
+            <input type="hidden" id="total_cost_field"          name="product[total_cost]"                value="<%= @product_costing&.total_cost || 0 %>">
+            <input type="hidden" id="profit_margin_cost_field"  name="product[profit_margin_amount]"      value="<%= @product_costing&.profit_margin_amount || 0 %>">
           </div>
         </div>
         <%# Action Buttons %>
@@ -322,20 +323,31 @@
     }
   </style>
   <script>
-    var existingIngredients = <%= @ingredients.map { |i| {
+    var initialCostingData = {
+      direct_cost: <%= (@product_costing&.direct_cost || 0).to_f %>,
+      overhead_cost: <%= (@product_costing&.overhead_cost || 0).to_f %>,
+      total_cost: <%= (@product_costing&.total_cost || 0).to_f %>,
+      profit_margin_amount: <%= (@product_costing&.profit_margin_amount || 0).to_f %>,
+      selling_price: <%= (@product_costing&.selling_price || 0).to_f %>
+    };
+
+    var existingIngredients = <%= (@product.ingredients || []).map { |i| {
+      ingredient_id: i.id,
       id:           i.material_id.to_s,
       name:         i.material.name,
       quantity:     i.quantity,
-      cost_per_unit: i.material.cost_per_unit,
+      original_quantity: i.quantity,
+      cost_per_unit: i.cost_per_unit,
       unit:         i.material.unit
     } }.to_json.html_safe %>;
 
     var ingList = [];
+    var deletedIngredients = [];
 
     // ─── Costing calculations ────────────────────────────
-       function calcCosting() {
+      function calcCosting() {
       var directCost  = ingList.reduce(function(sum, item) {
-    return sum + (parseFloat(item.cost_per_unit) * parseFloat(item.quantity));
+        return sum + (parseFloat(item.cost_per_unit) * parseFloat(item.quantity));
       }, 0);
 
       var overheadPct = parseFloat($('#overhead_percentage').val()) || 0;
@@ -357,29 +369,84 @@
 
       // Update hidden fields for form submission
       $('#direct_cost_field').val(directCost.toFixed(2));
-      $('#overhead_pct_field').val(overheadPct.toFixed(2));
       $('#overhead_cost_field').val(overheadAmt.toFixed(2));
       $('#total_cost_field').val(totalCost.toFixed(2));
-      $('#profit_margin_pct_field').val(marginPct.toFixed(2));
       $('#profit_margin_cost_field').val(marginAmt.toFixed(2));
 
       var sellingPrice  = parseFloat($('#selling_price').val()) || 0;
-      $('#selling_price_field').val(sellingPrice.toFixed(2));
+      updateActualProfitDisplay(sellingPrice, totalCost);
+    }
 
-      var actualProfit  = sellingPrice - totalCost;
+    function updateActualProfitDisplay(sellingPrice, totalCost) {
+      var actualProfit = sellingPrice - totalCost;
       var actualMarginPct = sellingPrice > 0 ? (actualProfit / sellingPrice) * 100 : 0;
 
       $('#display_actual_profit').text('₱' + actualProfit.toFixed(2))
-    .removeClass('text-green-700 text-red-600')
-    .addClass(actualProfit >= 0 ? 'text-green-700' : 'text-red-600');
+        .removeClass('text-green-700 text-red-600')
+        .addClass(actualProfit >= 0 ? 'text-green-700' : 'text-red-600');
 
       $('#display_actual_margin_pct').text(actualMarginPct.toFixed(2) + '%')
-    .removeClass('text-green-600 text-red-500 bg-green-100 bg-red-100')
-    .addClass(actualProfit >= 0 ? 'text-green-600 bg-green-100' : 'text-red-500 bg-red-100');
+        .removeClass('text-green-600 text-red-500 bg-green-100 bg-red-100')
+        .addClass(actualProfit >= 0 ? 'text-green-600 bg-green-100' : 'text-red-500 bg-red-100');
+    }
+
+    function renderCostingFromPersistedData() {
+      $('#display_direct_cost').text('₱' + initialCostingData.direct_cost.toFixed(2));
+      $('#display_overhead_cost').text('₱' + initialCostingData.overhead_cost.toFixed(2));
+      $('#display_total_cost').text('₱' + initialCostingData.total_cost.toFixed(2));
+      $('#display_margin_amount').text('₱' + initialCostingData.profit_margin_amount.toFixed(2));
+
+      var recommendedPrice = initialCostingData.total_cost + initialCostingData.profit_margin_amount;
+      $('#display_recommended_price').text('₱' + recommendedPrice.toFixed(2));
+
+      $('#direct_cost_field').val(initialCostingData.direct_cost.toFixed(2));
+      $('#overhead_cost_field').val(initialCostingData.overhead_cost.toFixed(2));
+      $('#total_cost_field').val(initialCostingData.total_cost.toFixed(2));
+      $('#profit_margin_cost_field').val(initialCostingData.profit_margin_amount.toFixed(2));
+
+      updateActualProfitDisplay(initialCostingData.selling_price, initialCostingData.total_cost);
+    }
+
+    function syncIngredientPayloadFields() {
+      var payloadFields = $('#ingredient_payload_fields');
+      var createIndex = 0;
+      var updateIndex = 0;
+
+      payloadFields.empty();
+
+      deletedIngredients.forEach(function(materialId) {
+        payloadFields.append(`
+          <input type="hidden" name="product[ingredients][to_delete][]" value="${materialId}">
+        `);
+      });
+
+      ingList.forEach(function(item) {
+        var quantity = parseFloat(item.quantity) || 0;
+        var originalQuantity = parseFloat(item.original_quantity) || 0;
+
+        if (item.persisted) {
+          if (quantity !== originalQuantity) {
+            payloadFields.append(`
+              <input type="hidden" name="product[ingredients][to_update][${updateIndex}][ingredient_id]" value="${item.ingredient_id}">
+              <input type="hidden" name="product[ingredients][to_update][${updateIndex}][material_id]" value="${item.id}">
+              <input type="hidden" name="product[ingredients][to_update][${updateIndex}][quantity]" value="${quantity}">
+              <input type="hidden" name="product[ingredients][to_update][${updateIndex}][cost_per_unit]" value="${item.cost_per_unit}">
+            `);
+            updateIndex += 1;
+          }
+        } else {
+          payloadFields.append(`
+            <input type="hidden" name="product[ingredients][to_create][${createIndex}][material_id]" value="${item.id}">
+            <input type="hidden" name="product[ingredients][to_create][${createIndex}][quantity]" value="${quantity}">
+            <input type="hidden" name="product[ingredients][to_create][${createIndex}][cost_per_unit]" value="${item.cost_per_unit}">
+          `);
+          createIndex += 1;
+        }
+      });
     }
 
     // ─── Render ingredient list ──────────────────────────
-    function renderIngList() {
+    function renderIngList(recalculateCosting = true) {
       $('#ingDisplay').empty();
 
       if (ingList.length === 0) {
@@ -388,31 +455,39 @@
             <p class="text-xs text-amber-400 font-medium italic">🫘 No ingredients added yet — start building your blend!</p>
           </div>
         `);
-        calcCosting();
+        if (recalculateCosting) calcCosting();
         return;
       }
 
-      ingList.forEach(function(item, idx) {
+      ingList.forEach(function(item) {
         var itemCost = (parseFloat(item.cost_per_unit) * parseFloat(item.quantity)).toFixed(2);
+        var quantityValue = parseFloat(item.quantity).toFixed(2);
         $('#ingDisplay').append(`
           <div id="ing-${item.id}" class="flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl">
             <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shrink-0"></div>
-            <span class="text-sm font-semibold text-amber-800 flex-1">${item.name}</span>
-            <span class="text-xs text-amber-500 font-medium">${parseFloat(item.quantity).toFixed(2)} ${item.unit}</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-amber-800 truncate">${item.name}</span>
+                ${item.persisted ? '<span class="text-[10px] font-bold uppercase tracking-wide text-amber-500 bg-amber-100 px-2 py-0.5 rounded-full">Saved</span>' : '<span class="text-[10px] font-bold uppercase tracking-wide text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">New</span>'}
+              </div>
+              <p class="text-xs text-amber-500 font-medium mt-0.5">₱${parseFloat(item.cost_per_unit).toFixed(2)} / ${item.unit}</p>
+            </div>
+            <div class="w-28">
+              <label class="sr-only" for="quantity-${item.id}">Quantity</label>
+              <input type="number" min="0" step="0.01" id="quantity-${item.id}" class="ingredient-quantity w-full px-3 py-2 text-sm text-amber-900 bg-white border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-right" value="${quantityValue}" data-id="${item.id}">
+            </div>
             <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-lg">₱${itemCost}</span>
             <button type="button" class="remove-ing w-6 h-6 flex items-center justify-center rounded-lg text-amber-300 hover:text-red-400 hover:bg-red-50 transition-all duration-150" data-id="${item.id}">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
-            <input type="hidden" name="product[ingredients][${idx}][material_id]"           value="${item.id}">
-            <input type="hidden" name="product[ingredients][${idx}][quantity]"      value="${item.quantity}">
-            <input type="hidden" name="product[ingredients][${idx}][cost_per_unit]" value="${item.cost_per_unit}">
           </div>
         `);
       });
 
-      calcCosting();
+      syncIngredientPayloadFields();
+      if (recalculateCosting) calcCosting();
     }
 
     // ─── Filter select ───────────────────────────────────
@@ -444,16 +519,34 @@
       }
       $('#ingredient_quantity').removeClass('border-red-400 ring-2 ring-red-200');
 
-      ingList.push({ id, name, quantity, cost_per_unit, unit });
+      deletedIngredients = deletedIngredients.filter(function(materialId) { return materialId !== id; });
+      ingList.push({ id: id, name: name, quantity: quantity, cost_per_unit: cost_per_unit, unit: unit, persisted: false });
       $('#ingredient_quantity').val('');
       renderIngList();
       filterMaterialsSelect();
     });
 
+    $(document).on('input', '.ingredient-quantity', function() {
+      var id = $(this).data('id').toString();
+      var quantity = parseFloat($(this).val()) || 0;
+      var item = ingList.find(function(entry) { return entry.id === id; });
+
+      if (!item) return;
+
+      item.quantity = quantity;
+      renderIngList();
+    });
+
     // ─── Remove ingredient ───────────────────────────────
     $(document).on('click', '.remove-ing', function() {
       var id = $(this).data("id").toString();
-      ingList = ingList.filter(i => i.id !== id);
+      var item = ingList.find(function(entry) { return entry.id === id; });
+
+      if (item && item.persisted) {
+        deletedIngredients.push(id);
+      }
+
+      ingList = ingList.filter(function(entry) { return entry.id !== id; });
       renderIngList();
       filterMaterialsSelect();
     });
@@ -463,9 +556,13 @@
 
     // ─── Init ────────────────────────────────────────────
     function initIngredients() {
-      ingList = existingIngredients || [];
-      renderIngList();
+      ingList = (existingIngredients || []).map(function(item) {
+        return Object.assign({ persisted: true }, item);
+      });
+      deletedIngredients = [];
+      renderIngList(false);
       filterMaterialsSelect();
+      renderCostingFromPersistedData();
     }
 
     // ─── Thumbnail preview ───────────────────────────────

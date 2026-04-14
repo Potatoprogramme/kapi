@@ -95,7 +95,7 @@
               <!-- Roast badge -->
               <div class="absolute bottom-2 left-3 z-10">
                 <div class="bg-amber-800/80 text-white text-xs font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
-                  <%= product.category_name %>
+                  <%= product.product_category.name %>
                 </div>
               </div>
             </div>
@@ -107,7 +107,7 @@
               <!-- Price -->
               <div class="mb-3 px-3 py-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100">
                 <div class="flex items-center justify-between">
-                  <span class="text-lg font-black text-green-600">₱<%= number_with_precision(product.selling_price, precision: 2, delimiter: ',') %></span>
+                  <span class="text-lg font-black text-green-600">₱<%= number_with_precision(product.product_costing.selling_price, precision: 2, delimiter: ',') %></span>
                   <div class="bg-red-400 text-white text-xs font-black px-2 py-0.5 rounded-full rotate-12 shadow-sm">NEW!</div>
                 </div>
               </div>
