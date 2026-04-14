@@ -26,7 +26,7 @@ module Api
                    sub: user.email_address,
                    iat: Time.current.to_i,
                    exp: 60.minutes.from_now.to_i,
-                   aud: 'http://api.kapi.com'
+                   aud: jwt_audience
                  },
                  jwt_secret,
                  ALGORITHM)
@@ -56,8 +56,8 @@ module Api
       render_unauthorized_access unless current_user
     end
 
-    def refresh_access_token
-      token = cookies[:refresh_token]
+    def refresh_access_token(header = request.headers['Authorization'])
+      token = header&.split&.last
       return nil if token.blank?
 
       payload, = JWT.decode(token, jwt_secret, true, decode_options)
