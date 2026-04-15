@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[show edit]
-  before_action :load_form_data, only: %i[new edit]
+  before_action :set_product, only: %i[show edit destroy]
+  before_action :load_form_data, only: %i[new create edit]
   # allow_unauthenticated_access only: %i[index show]
   def index
     @products = Product.active.order(name: :asc)
@@ -17,7 +17,6 @@ class ProductsController < ApplicationController
   def edit; end
 
   def create
-    # render json: ingredient_create_params
     result = Products::CreateProduct.call(product_params: product_params,
                                           ingredient_create_params: ingredient_create_params,
                                           product_costing_params: product_costing_params,
@@ -25,11 +24,14 @@ class ProductsController < ApplicationController
     if result.success?
       redirect_to products_path, notice: t('.success')
     else
-      load_form_data
-      @product = result.product || Product.new(product_params)
-      @product.errors.add(:base, result.errors) if result.errors.present?
+      alert('Failed to create product')
       render :new, status: :unprocessable_content
     end
+  end
+
+  def destroy
+    @product.destroy!
+    redirect_to products_path, notice: t('.success')
   end
 
   private
@@ -43,9 +45,7 @@ class ProductsController < ApplicationController
   end
 
   def ingredient_create_params
-    params.expect(product: {
-                    ingredients: [{ to_create: [%i[material_id quantity cost_per_unit]] }]
-                  })[:ingredients][:to_create]
+    params.dig(:product, :ingredients, :to_create) || []
   end
 
   def product_costing_params
