@@ -324,11 +324,13 @@
   </style>
   <script>
     var initialCostingData = {
-      direct_cost: <%= (@product_costing&.direct_cost || 0).to_f %>,
-      overhead_cost: <%= (@product_costing&.overhead_cost || 0).to_f %>,
-      total_cost: <%= (@product_costing&.total_cost || 0).to_f %>,
-      profit_margin_amount: <%= (@product_costing&.profit_margin_amount || 0).to_f %>,
-      selling_price: <%= (@product_costing&.selling_price || 0).to_f %>
+      direct_cost: <%= (@product.product_costing&.direct_cost || 0).to_f %>,
+      overhead_cost: <%= (@product.product_costing&.overhead_cost || 0).to_f %>,
+      total_cost: <%= (@product.product_costing&.total_cost || 0).to_f %>,
+      profit_margin_amount: <%= (@product.product_costing&.profit_margin_amount || 0).to_f %>,
+      selling_price: <%= (@product.product_costing&.selling_price || 0).to_f %>,
+      overhead_percentage: <%= (@product.product_costing&.overhead_percentage || 0).to_f %>,
+      profit_margin_percentage: <%= (@product.product_costing&.profit_margin_percentage || 0).to_f %>,
     };
 
     var existingIngredients = <%= (@product.ingredients || []).map { |i| {
@@ -337,7 +339,7 @@
       name:         i.material.name,
       quantity:     i.quantity,
       original_quantity: i.quantity,
-      cost_per_unit: i.cost_per_unit,
+      cost_per_unit: i.material.cost_per_unit,
       unit:         i.material.unit
     } }.to_json.html_safe %>;
 
@@ -391,11 +393,13 @@
     }
 
     function renderCostingFromPersistedData() {
+      $('#overhead_percentage').val(initialCostingData.overhead_percentage.toFixed(2));
+      $('#profit_margin_percentage').val(initialCostingData.profit_margin_percentage.toFixed(2));
       $('#display_direct_cost').text('₱' + initialCostingData.direct_cost.toFixed(2));
       $('#display_overhead_cost').text('₱' + initialCostingData.overhead_cost.toFixed(2));
       $('#display_total_cost').text('₱' + initialCostingData.total_cost.toFixed(2));
       $('#display_margin_amount').text('₱' + initialCostingData.profit_margin_amount.toFixed(2));
-
+       $('#selling_price').val(initialCostingData.selling_price.toFixed(2));
       var recommendedPrice = initialCostingData.total_cost + initialCostingData.profit_margin_amount;
       $('#display_recommended_price').text('₱' + recommendedPrice.toFixed(2));
 
