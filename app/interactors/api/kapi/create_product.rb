@@ -6,6 +6,7 @@ module Api
       include Interactor
 
       def call
+        validate_ingredients!
         ActiveRecord::Base.transaction do
           create_product!
           create_ingredients!
@@ -13,6 +14,7 @@ module Api
         end
         context.product = @product
       rescue ActiveRecord::RecordInvalid => e
+        context.product = @product || e.record
         context.fail!(error: e.record.errors.full_messages.to_sentence)
       end
 
@@ -35,22 +37,27 @@ module Api
       end
 
       def create_ingredients!
-        ingredients = product_params[:ingredients] || []
-        ingredients&.each_value do |ing|
-          @ingredient = Ingredient.create!(material_id: ing['material_id'], product_id: @product.id,
-                                           user_id: context.user_id)
+        context.ingredient_create_params.each do |ing|
+          @ingredient = Ingredient.create!(
+            material_id: ing['material_id'],
+            product_id: @product.id,
+            user_id: context.user_id
+          )
           create_ingredient_costing!(@ingredient.id, ing['quantity'], ing['cost_per_unit'])
         end
       end
 
-      def create_ingredient_costing!(ingredient_id, quantity, cost_per_unit)
-        total_cost = (quantity.to_f * cost_per_unit.to_f).round(3)
-        IngredientCosting.create!(ingredient_id: ingredient_id, quantity: quantity.to_f,
-                                  ingredient_total_cost: total_cost)
-      end
-
       def create_product_costing!
         ProductCosting.create!(product_costing_params.merge(product_id: @product.id))
+      end
+
+      def validate_ingredients!
+        return if context.ingredient_create_params.present?
+
+        @product = Product.new(product_params)
+        @product.errors.add(:ingredients, "can't be blank")
+        context.product = @product
+        context.fail!(errors: @product.errors.full_messages.to_sentence)
       end
     end
   end

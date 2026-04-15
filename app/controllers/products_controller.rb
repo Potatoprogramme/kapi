@@ -24,7 +24,7 @@ class ProductsController < ApplicationController
     if result.success?
       redirect_to products_path, notice: t('.success')
     else
-      alert('Failed to create product')
+      @product = result.product
       render :new, status: :unprocessable_content
     end
   end
@@ -45,7 +45,7 @@ class ProductsController < ApplicationController
   end
 
   def ingredient_create_params
-    params.dig(:product, :ingredients, :to_create) || []
+    params.dig(:product, :ingredients, :to_create) if params[:product][:ingredients].present?
   end
 
   def product_costing_params

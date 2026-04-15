@@ -81,8 +81,8 @@
                     Edit
                   <% end %>
                   <div class="border-t border-red-50 my-1"></div>
-                  <%= button_to soft_delete_product_path(product),
-                    method: :patch,
+                  <%= button_to product_path(product),
+                    method: :delete,
                     data: { confirm: "☕ Remove #{product.name} from your collection?"},
                     class: "w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors" do %>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

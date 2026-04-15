@@ -5,6 +5,7 @@ module Products
     include Interactor
 
     def call
+      validate_ingredients!
       ActiveRecord::Base.transaction do
         create_product!
         create_ingredients!
@@ -31,11 +32,10 @@ module Products
     end
 
     def create_product!
-      @product = Product.new(name: product_params[:name],
-                             product_category_id: product_params[:product_category_id],
-                             thumbnail: product_params[:thumbnail],
-                             user_id: context.user_id)
-      @product.save!
+      @product = Product.create!(name: product_params[:name],
+                                 product_category_id: product_params[:product_category_id],
+                                 thumbnail: product_params[:thumbnail],
+                                 user_id: context.user_id)
     end
 
     def create_ingredients!
@@ -55,6 +55,13 @@ module Products
       ProductCosting.create!(product_costing_params.merge(product_id: @product.id))
     end
 
-    
+    def validate_ingredients!
+      return if context.ingredient_create_params.present?
+
+      @product = Product.new(product_params)
+      @product.errors.add(:ingredients, "can't be blank")
+      context.product = @product
+      context.fail!(errors: @product.errors.full_messages.to_sentence)
+    end
   end
 end

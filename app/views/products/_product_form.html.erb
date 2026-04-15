@@ -26,34 +26,33 @@
         <div class="absolute -bottom-1 -left-2 w-2.5 h-3 bg-amber-900 rounded-full" style="animation: floatBean 3s ease-in-out infinite; animation-delay: 1.5s;"></div>
       </div>
       <h1 class="text-3xl font-black text-amber-900 tracking-tight mb-1">
-        <%= @product.new_record? ? "Add New Blend" : "Edit Coffee Blend" %>
+        <%= editing ? "Edit Coffee Blend" : "Add New Blend" %>
       </h1>
       <p class="text-sm text-amber-600/80 font-medium">
-        <%= @product.new_record? ? "Craft your perfect coffee blend ✨" : "Update your blend details ✨" %>
+        <%= editing ? "Update your blend details ✨" : "Craft your perfect coffee blend ✨" %>
       </p>
     </div>
-    <%# Validation Errors %>
-    <% if @product.errors.any? %>
-      <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 flex gap-3">
-        <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
-          <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-bold text-red-700 mb-1">
-            <%= pluralize(@product.errors.count, "error") %> prevented this blend from saving:
-          </p>
-          <ul class="text-sm text-red-600 list-disc list-inside space-y-0.5">
-            <% @product.errors.full_messages.each do |msg| %>
-              <li><%= msg %></li>
-            <% end %>
-          </ul>
-        </div>
-      </div>
-    <% end %>
     <%# Form %>
     <%= form_with model: @product, data: {turbo: false}, multipart: true do |form| %>
+      <% if @product.errors.any? %>
+        <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 flex gap-3">
+          <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-red-700 mb-1">
+              <%= pluralize(@product.errors.count, "error") %> prevented this blend from saving:
+            </p>
+            <ul class="text-sm text-red-600 list-disc list-inside space-y-0.5">
+              <% @product.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
       <div class="bg-white/80 backdrop-blur-sm rounded-3xl border border-amber-100 shadow-xl shadow-amber-100/50 overflow-hidden">
         <%# Coffee Name %>
         <div class="p-6 border-b border-amber-50">
@@ -304,8 +303,7 @@
         </div>
         <%# Action Buttons %>
         <div class="flex gap-3 mt-6">
-          <%= form.submit @product.new_record? ? "Save Coffee Blend" : "Update Coffee Blend",
-            class: "flex-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 active:scale-[0.99] text-white font-bold py-3.5 px-6 rounded-2xl transition-all duration-200 text-sm cursor-pointer shadow-lg shadow-amber-200" %>
+          <%= form.submit class: "flex-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 active:scale-[0.99] text-white font-bold py-3.5 px-6 rounded-2xl transition-all duration-200 text-sm cursor-pointer shadow-lg shadow-amber-200" %>
           <%= link_to "Cancel", products_path,
             class: "flex-1 text-center bg-white hover:bg-amber-50 text-amber-700 font-bold py-3.5 px-6 rounded-2xl border-2 border-amber-200 hover:border-amber-300 transition-all duration-200 text-sm" %>
         </div>
