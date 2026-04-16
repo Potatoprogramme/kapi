@@ -57,7 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_083043) do
 
   create_table "materials", force: :cascade do |t|
     t.float "cost"
-    t.virtual "cost_per_unit", type: :decimal, precision: 12, scale: 4, as: "(cost / NULLIF(quantity, (0)::double precision))", stored: true
+    t.float "cost_per_unit"
     t.datetime "created_at", null: false
     t.string "name"
     t.float "quantity"
