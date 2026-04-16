@@ -20,26 +20,23 @@ module Products
     private
 
     def product_params
-      context.product_params.to_h
+      context.product_params
     end
 
-    def ingredient_params
-      context.ingredient_create_params.to_h
+    def to_create_ingredients
+      context.ingredient_create_params
     end
 
     def product_costing_params
-      context.product_costing_params.to_h
+      context.product_costing_params
     end
 
     def create_product!
-      @product = Product.create!(name: product_params[:name],
-                                 product_category_id: product_params[:product_category_id],
-                                 thumbnail: product_params[:thumbnail],
-                                 user_id: context.user_id)
+      @product = Product.create!(product_params.merge(user_id: context.user_id))
     end
 
     def create_ingredients!
-      ingredient_params&.each_value do |ing|
+      to_create_ingredients&.each_value do |ing|
         total_cost = (ing['quantity'].to_f * ing['cost_per_unit'].to_f).round(3)
         @ingredient = Ingredient.create!(
           material_id: ing['material_id'],

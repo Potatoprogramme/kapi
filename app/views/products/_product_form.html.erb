@@ -416,9 +416,9 @@
 
       payloadFields.empty();
 
-      deletedIngredients.forEach(function(materialId) {
+      deletedIngredients.forEach(function(ingredientId) {
         payloadFields.append(`
-          <input type="hidden" name="product[ingredients][to_delete][]" value="${materialId}">
+          <input type="hidden" name="product[ingredients][to_delete][]" value="${ingredientId}">
         `);
       });
 
@@ -452,6 +452,7 @@
       $('#ingDisplay').empty();
 
       if (ingList.length === 0) {
+        syncIngredientPayloadFields();
         $('#ingDisplay').append(`
           <div class="text-center py-4 bg-amber-50/50 rounded-xl border border-dashed border-amber-200">
             <p class="text-xs text-amber-400 font-medium italic">🫘 No ingredients added yet — start building your blend!</p>
@@ -463,7 +464,7 @@
 
       ingList.forEach(function(item) {
         var itemCost = (parseFloat(item.cost_per_unit) * parseFloat(item.quantity)).toFixed(2);
-        var quantityValue = parseFloat(item.quantity).toFixed(2);
+        var quantityValue = (parseFloat(item.quantity) || 0).toFixed(2);
         $('#ingDisplay').append(`
           <div id="ing-${item.id}" class="flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl">
             <div class="w-2 h-2 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shrink-0"></div>
@@ -478,7 +479,7 @@
               <label class="sr-only" for="quantity-${item.id}">Quantity</label>
               <input type="number" min="0" step="0.01" id="quantity-${item.id}" class="ingredient-quantity w-full px-3 py-2 text-sm text-amber-900 bg-white border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-right" value="${quantityValue}" data-id="${item.id}">
             </div>
-            <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-lg">₱${itemCost}</span>
+            <span class="ingredient-item-cost text-xs font-bold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-lg">₱${itemCost}</span>
             <button type="button" class="remove-ing w-6 h-6 flex items-center justify-center rounded-lg text-amber-300 hover:text-red-400 hover:bg-red-50 transition-all duration-150" data-id="${item.id}">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -521,7 +522,13 @@
       }
       $('#ingredient_quantity').removeClass('border-red-400 ring-2 ring-red-200');
 
-      deletedIngredients = deletedIngredients.filter(function(materialId) { return materialId !== id; });
+      var restoredIngredientIds = (existingIngredients || [])
+        .filter(function(ing) { return ing.id === id; })
+        .map(function(ing) { return ing.ingredient_id.toString(); });
+
+      deletedIngredients = deletedIngredients.filter(function(ingredientId) {
+        return !restoredIngredientIds.includes(ingredientId.toString());
+      });
       ingList.push({ id: id, name: name, quantity: quantity, cost_per_unit: cost_per_unit, unit: unit, persisted: false });
       $('#ingredient_quantity').val('');
       renderIngList();
@@ -530,13 +537,19 @@
 
     $(document).on('input', '.ingredient-quantity', function() {
       var id = $(this).data('id').toString();
-      var quantity = parseFloat($(this).val()) || 0;
+      var quantityRaw = $(this).val();
+      var quantity = parseFloat(quantityRaw) || 0;
       var item = ingList.find(function(entry) { return entry.id === id; });
 
       if (!item) return;
 
       item.quantity = quantity;
-      renderIngList();
+
+      var itemCost = (parseFloat(item.cost_per_unit) || 0) * quantity;
+      $(this).closest('div[id^="ing-"]').find('.ingredient-item-cost').text('₱' + itemCost.toFixed(2));
+
+      syncIngredientPayloadFields();
+      calcCosting();
     });
 
     // ─── Remove ingredient ───────────────────────────────
@@ -545,7 +558,10 @@
       var item = ingList.find(function(entry) { return entry.id === id; });
 
       if (item && item.persisted) {
-        deletedIngredients.push(id);
+        var ingredientId = item.ingredient_id.toString();
+        if (!deletedIngredients.includes(ingredientId)) {
+          deletedIngredients.push(ingredientId);
+        }
       }
 
       ingList = ingList.filter(function(entry) { return entry.id !== id; });

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[show edit destroy]
-  before_action :load_form_data, only: %i[new create edit]
-  # allow_unauthenticated_access only: %i[index show]
+  before_action :set_product, only: %i[show edit update destroy]
+  before_action :load_form_data, only: %i[new create edit update]
+  allow_unauthenticated_access only: %i[index show]
   def index
     @products = Product.active.order(name: :asc)
   end
@@ -29,6 +29,21 @@ class ProductsController < ApplicationController
     end
   end
 
+  def update
+    result = Products::UpdateProduct.call(product: @product, product_params: product_params,
+                                          ingredient_create_params: ingredient_create_params,
+                                          ingredient_delete_params: ingredient_delete_params,
+                                          ingredient_update_params: ingredient_update_params,
+                                          product_costing_params: product_costing_params,
+                                          user_id: Current.user.id)
+    if result.success?
+      redirect_to edit_product_path(@product), notice: t('.success')
+    else
+      @product = result.product
+      render :edit, status: :unprocessable_content
+    end
+  end
+
   def destroy
     @product.destroy!
     redirect_to products_path, notice: t('.success')
@@ -45,7 +60,15 @@ class ProductsController < ApplicationController
   end
 
   def ingredient_create_params
-    params.dig(:product, :ingredients, :to_create) if params[:product][:ingredients].present?
+    params.dig(:product, :ingredients, :to_create) || []
+  end
+
+  def ingredient_delete_params
+    params.dig(:product, :ingredients, :to_delete) || []
+  end
+
+  def ingredient_update_params
+    params.dig(:product, :ingredients, :to_update) || []
   end
 
   def product_costing_params
