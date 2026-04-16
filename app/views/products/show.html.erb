@@ -28,7 +28,7 @@
             <div class="flex-1">
               <p class="text-sm font-bold text-amber-900"><%= ing.material&.name %></p>
               <p class="text-xs text-amber-400 mt-0.5">
-                ₱<%= number_with_precision(ing.material&.cost_per_unit, precision: 2) %> / <%= ing.material&.unit %>
+                ₱<%= number_with_precision(ing.material&.cost_per_unit, precision: 4) %> / <%= ing.material&.unit %>
               </p>
             </div>
             <div class="text-right">
