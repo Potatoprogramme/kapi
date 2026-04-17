@@ -8,7 +8,7 @@ json.extract! order,
               :created_at,
               :updated_at
 json.order_items do
-  order.order_items.each do |item|
+  json.array! order.order_items do |item|
     json.item_id item.id
     json.product_id item.product_id
     json.item_name item.item_name
