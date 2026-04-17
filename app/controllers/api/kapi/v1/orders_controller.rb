@@ -2,6 +2,7 @@
 
 module Api::Kapi::V1
   class OrdersController < Api::Kapi::V1::ApiController
+    before_action :set_order, only: %i[hard_delete]
     before_action :authenticate_user!, except: %i[index]
 
     def index
@@ -11,13 +12,30 @@ module Api::Kapi::V1
     def create
       result = Orders::CreateOrder.call(order_params: order_params,
                                         order_items_params: order_items_params,
-                                        user_id: Current.user.id)
+                                        user_id: current_user.id)
       return unless result.success?
 
+      @order = result.order
       render :create, status: :created
     end
 
+    def hard_delete
+      @order.destroy!
+    end
+
+    def complete
+      Order.where(id: params[:id]).update!(status: :completed)
+    end
+
+    def void
+      Order.where(id: params[:id]).update!(status: :voided)
+    end
+
     private
+
+    def set_order
+      @order = Order.find(params[:id])
+    end
 
     def load_data(tab = 'pending')
       # For Product Options
