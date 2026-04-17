@@ -19,7 +19,7 @@ module Api::Kapi::V1
         @product = result.product
         render :create, status: :created
       else
-        render_error(status: :unprocessable_content, message: 'Error saving', errors: result)
+        render_error(status: :unprocessable_content, message: 'Failed to save product', errors: result.product.errors)
       end
     end
 
@@ -30,7 +30,10 @@ module Api::Kapi::V1
                                             ingredient_update_params: ingredient_update_params,
                                             product_costing_params: product_costing_params,
                                             user_id: current_user.id)
-      render_error(status: :unprocessable_content, message: 'Error saving', errors: result.product) if result.failure?
+      return unless result.failure?
+
+      render_error(status: :unprocessable_content, message: 'Error saving',
+                   errors: result.product.errors)
     end
 
     def destroy
