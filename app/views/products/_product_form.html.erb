@@ -522,14 +522,30 @@
       }
       $('#ingredient_quantity').removeClass('border-red-400 ring-2 ring-red-200');
 
-      var restoredIngredientIds = (existingIngredients || [])
-        .filter(function(ing) { return ing.id === id; })
-        .map(function(ing) { return ing.ingredient_id.toString(); });
-
-      deletedIngredients = deletedIngredients.filter(function(ingredientId) {
-        return !restoredIngredientIds.includes(ingredientId.toString());
+      var restoredIngredient = (existingIngredients || []).find(function(ing) {
+        return ing.id === id;
       });
-      ingList.push({ id: id, name: name, quantity: quantity, cost_per_unit: cost_per_unit, unit: unit, persisted: false });
+
+      if (restoredIngredient) {
+        var restoredId = restoredIngredient.ingredient_id.toString();
+        deletedIngredients = deletedIngredients.filter(function(ingredientId) {
+          return ingredientId.toString() !== restoredId;
+        });
+
+        ingList.push({
+          ingredient_id: restoredIngredient.ingredient_id,
+          id: restoredIngredient.id,
+          name: restoredIngredient.name,
+          quantity: quantity,
+          original_quantity: restoredIngredient.original_quantity,
+          cost_per_unit: restoredIngredient.cost_per_unit,
+          unit: restoredIngredient.unit,
+          persisted: true
+        });
+      } else {
+        ingList.push({ id: id, name: name, quantity: quantity, cost_per_unit: cost_per_unit, unit: unit, persisted: false });
+      }
+
       $('#ingredient_quantity').val('');
       renderIngList();
       filterMaterialsSelect();
