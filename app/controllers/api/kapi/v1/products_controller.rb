@@ -11,9 +11,10 @@ module Api::Kapi::V1
     def show; end
 
     def create
-      result = Api::Kapi::CreateProduct.call(product_params: product_params,
-                                             product_costing_params: product_costing_params,
-                                             user_id: current_user.id)
+      result = Products::CreateProduct.call(product_params: product_params,
+                                            ingredient_create_params: ingredient_create_params,
+                                            product_costing_params: product_costing_params,
+                                            user_id: current_user.id)
       if result.success?
         @product = result.product
         render :create, status: :created
@@ -23,13 +24,13 @@ module Api::Kapi::V1
     end
 
     def update
-      result = Api::Kapi::UpdateProduct.call(
-        product_params: product_params,
-        product_costing_params: product_costing_params,
-        ingredient_delete_params: ingredient_delete_params,
-        ingredient_update_params: ingredient_update_params,
-        ingredient_create_params: ingredient_create_params
-      )
+      result = Products::UpdateProduct.call(product: @product, product_params: product_params,
+                                            ingredient_create_params: ingredient_create_params,
+                                            ingredient_delete_params: ingredient_delete_params,
+                                            ingredient_update_params: ingredient_update_params,
+                                            product_costing_params: product_costing_params,
+                                            user_id: current_user.id)
+      render_error(status: :unprocessable_content, message: 'Error saving', errors: result.product) if result.failure?
     end
 
     def destroy
@@ -47,36 +48,19 @@ module Api::Kapi::V1
     end
 
     def product_params
-      params.expect(product: [
-                      :name,
-                      :product_category_id,
-                      :thumbnail,
-                      { ingredients: [%i[material_id quantity cost_per_unit]] }
-                    ])
-    end
-
-    def ingredient_delete_params
-      params.expect(product: [
-                      { ingredients: [
-                        { to_delete: [] }
-                      ] }
-                    ])
-    end
-
-    def ingredient_update_params
-      params.expect(product: [
-                      { ingredients: [
-                        { to_update: [%i[ingredient_id quantity cost_per_unit]] }
-                      ] }
-                    ])
+      params.expect(product: %i[name product_category_id description thumbnail])
     end
 
     def ingredient_create_params
-      params.expect(product: [
-                      { ingredients: [
-                        { to_create: [%i[material_id quantity cost_per_unit]] }
-                      ] }
-                    ])
+      params.dig(:product, :ingredients, :to_create) || []
+    end
+
+    def ingredient_delete_params
+      params.dig(:product, :ingredients, :to_delete) || []
+    end
+
+    def ingredient_update_params
+      params.dig(:product, :ingredients, :to_update) || []
     end
 
     def product_costing_params
