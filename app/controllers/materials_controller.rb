@@ -3,8 +3,14 @@
 class MaterialsController < ApplicationController
   before_action :set_material, only: %i[show edit update destroy]
   allow_unauthenticated_access only: %i[index show]
+
   def index
-    @materials = Material.order(name: :asc)
+    result = MaterialsQuery.call(params)
+    @materials = result.records
+    @materials_page = result
+    @materials_total_count = result.total_count
+    @materials_total_cost = result.filtered_relation.sum(:cost)
+    @materials_unit_types = result.filtered_relation.distinct.count(:unit)
   end
 
   def show; end
