@@ -4,8 +4,7 @@ module Products
   class CreateProduct
     include Interactor
 
-    delegate :product,
-             :product_params,
+    delegate :product_params,
              :ingredient_create_params,
              :product_costing_params,
              :user_id,
@@ -15,7 +14,7 @@ module Products
 
     def call
       ActiveRecord::Base.transaction do
-        self.product = create_product!
+        context.product = create_product!
         create_ingredients!
         create_product_costing!
       end
@@ -34,7 +33,7 @@ module Products
         total_cost = (ing['quantity'].to_f * ing['cost_per_unit'].to_f).round(3)
         Ingredient.create!(
           material_id: ing['material_id'],
-          product_id: product.id,
+          product_id: context.product.id,
           user_id: user_id,
           quantity: ing['quantity'].to_f,
           total_cost: total_cost
@@ -43,13 +42,13 @@ module Products
     end
 
     def create_product_costing!
-      ProductCosting.create!(product_costing_params.merge(product_id: product.id))
+      ProductCosting.create!(product_costing_params.merge(product_id: context.product.id))
     end
 
     def validate_ingredients!
       return if ingredient_create_params.present?
 
-      self.product = Product.new(product_params)
+      context.product = Product.new(product_params)
       product.errors.add(:ingredients, "can't be blank")
       context.fail!(errors: product.errors.full_messages.to_sentence)
     end
