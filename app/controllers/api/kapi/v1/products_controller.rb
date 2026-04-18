@@ -19,7 +19,7 @@ module Api::Kapi::V1
         @product = result.product
         render :create, status: :created
       else
-        render_error(status: :unprocessable_content, message: 'Failed to save product', errors: result.product.errors)
+        render_error(status: :unprocessable_content, message: 'Failed to save product', errors: result.errors)
       end
     end
 
