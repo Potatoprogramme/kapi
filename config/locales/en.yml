@@ -29,6 +29,10 @@
 
 en:
   hello: "Hello world"
+  registrations:
+    create:
+      success: "User registered successfully."
+      failure: "Failed to register user."
   products:
     create:
       success: "Product was successfully created."
@@ -36,7 +40,7 @@ en:
     update:
       success: "Product was successfully updated."
       failure: "Could not update product."
-    soft_delete:
+    destroy:
       success: "Product was successfully deleted."
       failure: "Failed to delete product."
   materials:
@@ -63,5 +67,9 @@ en:
     create:
       success: "Order created successfully."
       failure: "Failed to create order."
-    complete_order:
-      success: "Updated successfully"
+    complete:
+      success: "Order was completed successfully."
+      failure: "Failed to complete order."
+    void:
+      success: "Order was voided successfully."
+      failure: "Failed to void order."

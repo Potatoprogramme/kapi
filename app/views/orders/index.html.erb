@@ -29,7 +29,7 @@
           <div class="text-sm text-gray-600 mb-2">
             <ul class="list-disc pl-5">
               <% order.order_items.each do |item| %>
-                <li class="flex justify-between "><span><span class="font-semibold"><%= item.product.name %></span> × <%= item.quantity %></span> <%= item.cost_per_item %> </li>
+                <li class="flex justify-between "><span><span class="font-semibold"><%= item.product.name %></span> × <%= item.quantity %></span> <%= number_with_precision(item.item_total_cost, precision: 2) %> </li>
               <% end %>
             </ul>
           </div>

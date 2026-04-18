@@ -3,8 +3,14 @@
 class MaterialsController < ApplicationController
   before_action :set_material, only: %i[show edit update destroy]
   allow_unauthenticated_access only: %i[index show]
+
   def index
-    @materials = Material.all
+    result = MaterialsQuery.call(params)
+    @materials = result.records
+    @materials_page = result
+    @materials_total_count = result.total_count
+    @materials_total_cost = result.filtered_relation.sum(:cost)
+    @materials_unit_types = result.filtered_relation.distinct.count(:unit)
   end
 
   def show; end
@@ -18,6 +24,7 @@ class MaterialsController < ApplicationController
   def create
     @material = Material.new(material_params)
     @material.user_id = Current.user.id
+
     if @material.save
       redirect_to materials_path, notice: t('.success')
     else
@@ -36,7 +43,7 @@ class MaterialsController < ApplicationController
 
   def destroy
     if Ingredient.exists?(material_id: @material.id)
-      redirect_back_or_to(materials_path, notice: t('.exists'))
+      redirect_back_or_to(materials_path, flash: { error: t('.exists') })
     else
       @material.destroy
       redirect_to materials_path, notice: t('.success')
@@ -46,7 +53,7 @@ class MaterialsController < ApplicationController
   private
 
   def material_params
-    params.expect(material: %i[name quantity cost grams cost_per_unit unit])
+    params.expect(material: %i[name quantity cost cost_per_unit unit])
   end
 
   def set_material

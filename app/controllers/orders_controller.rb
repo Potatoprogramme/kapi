@@ -1,25 +1,29 @@
 # frozen_string_literal: true
 
 class OrdersController < ApplicationController
+  before_action :load_data, only: %i[create]
   def index
     load_data(params[:tab])
   end
 
   def create
-    insert_order
-    redirect_to orders_path, notice: t('.success')
-  rescue StandardError => e
-    load_data
-    flash.now[:alert] = e.message
-    render :index, status: :unprocessable_content
+    result = Orders::CreateOrder.call(order_params: order_params,
+                                      order_items_params: order_items_params,
+                                      user_id: Current.user.id)
+    if result.success?
+      redirect_to orders_path, notice: t('.success')
+    else
+      load_data
+      render :index, status: :unprocessable_content
+    end
   end
 
-  def complete_order
+  def complete
     Order.where(id: params[:id]).update(status: :completed)
     redirect_to orders_path, notice: t('.success')
   end
 
-  def void_order
+  def void
     Order.where(id: params[:id]).update(status: :voided)
     redirect_to orders_path, notice: t('.success')
   end
@@ -35,24 +39,6 @@ class OrdersController < ApplicationController
 
   def order_items_params
     params.expect(order: { order_items_attributes: [%i[product_id quantity]] })
-  end
-
-  def insert_order
-    order = Order.new(order_params)
-    order[:user_id] = Current.user.id
-    ActiveRecord::Base.transaction do
-      order.save!
-      order_items_params[:order_items_attributes].each_value do |item|
-        insert_order_item(order.id, item['product_id'], item['quantity'])
-      end
-    end
-  end
-
-  def insert_order_item(order_id, product_id, quantity)
-    product = Product.includes(:product_costing).find(product_id)
-    item_total_cost = (quantity.to_f * product.product_costing.selling_price.to_f).to_f.round(2)
-    OrderItem.create!(order_id: order_id, product_id: product_id, cost_per_item: product.product_costing.selling_price,
-                      item_name: product.name, quantity: quantity, item_total_cost: item_total_cost)
   end
 
   def load_data(tab = 'pending')

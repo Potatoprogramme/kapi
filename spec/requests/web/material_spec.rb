@@ -3,12 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe 'Materials', type: :request do
-  let!(:material) { create(:material) }
+  let!(:user) { create(:user) }
+  let!(:material) { create(:material, user: user) }
   let(:valid_attributes) { attributes_for(:material) }
   let(:invalid_attributes) { attributes_for(:material, name: nil) }
 
   before do
-    user = create(:user)
     post session_path, params: { email_address: user.email_address, password: 'password' }
   end
   describe 'GET /index' do
@@ -41,7 +41,7 @@ RSpec.describe 'Materials', type: :request do
         expect do
           post materials_path, params: { material: invalid_attributes }
         end.not_to change(Material, :count)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
@@ -59,7 +59,9 @@ RSpec.describe 'Materials', type: :request do
 
   describe 'PATCH /update' do
     context 'when valid params' do
-      let(:new_attributes) { { name: 'Updated Bean', cost: 90.00, quantity: 300 } }
+      let(:new_attributes) do
+        { name: 'Updated Bean', cost: 90.00, quantity: 300, cost_per_unit: 0.3, unit: material.unit }
+      end
 
       it 'updates the material data an redirects to materials_path' do
         patch material_path(material), params: { material: new_attributes }
@@ -72,7 +74,7 @@ RSpec.describe 'Materials', type: :request do
       it 'does not update material and redirects back to edit form' do
         patch material_path(material), params: { material: invalid_attributes }
         expect(material.reload.name).to eq(material.name)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end

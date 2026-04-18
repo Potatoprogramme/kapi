@@ -4,5 +4,6 @@ class Ingredient < ApplicationRecord
   belongs_to :material
   belongs_to :product
   belongs_to :user
-  has_one :ingredient_costing, dependent: :destroy
+
+  validates :quantity, :total_cost, presence: true
 end
