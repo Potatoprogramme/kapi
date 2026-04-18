@@ -16,14 +16,12 @@
           <p class="text-gray-600 text-sm">Manage Your Coffee Labels</p>
         </div>
       </div>
-      <% if @categories.present? %>
-        <%= link_to new_product_category_path,
+      <%= link_to new_product_category_path,
             class: 'inline-flex items-center bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 shadow-sm' do %>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-          </svg>
-          <span class="text-sm">Add New Category</span>
-        <% end %>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <span class="text-sm">Add New Category</span>
       <% end %>
     </div>
     <!-- Categories List -->
