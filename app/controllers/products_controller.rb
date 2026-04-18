@@ -30,7 +30,8 @@ class ProductsController < ApplicationController
   end
 
   def update
-    result = Products::UpdateProduct.call(product: @product, product_params: product_params,
+    result = Products::UpdateProduct.call(product: @product,
+                                          product_params: product_params,
                                           ingredient_create_params: ingredient_create_params,
                                           ingredient_delete_params: ingredient_delete_params,
                                           ingredient_update_params: ingredient_update_params,
