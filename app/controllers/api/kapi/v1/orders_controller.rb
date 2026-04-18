@@ -6,17 +6,19 @@ module Api::Kapi::V1
     before_action :authenticate_user!, except: %i[index]
 
     def index
-      load_data(params[:tab])
+      fetch_orders(params[:filter])
     end
 
     def create
       result = Orders::CreateOrder.call(order_params: order_params,
                                         order_items_params: order_items_params,
                                         user_id: current_user.id)
-      return unless result.success?
-
-      @order = result.order
-      render :create, status: :created
+      if result.success?
+        @order = result.order
+        render :create, status: :created
+      else
+        render_error(status: :unprocessable_content, message: 'Order created successfully', errors: result.errors)
+      end
     end
 
     def hard_delete
@@ -37,15 +39,10 @@ module Api::Kapi::V1
       @order = Order.find(params[:id])
     end
 
-    def load_data(tab = 'pending')
-      # For Product Options
-      @products = Product.active.left_joins(:product_costing,
-                                            :product_category)
-                         .select('products.*, product_costings.selling_price,
-                       product_categories.name as category_name, product_categories.id as category_id')
-      # For Listing Orders
-      status = Order.statuses.keys.include?(tab) ? tab : 'pending'
-      @orders = Order.where(status: status).order(id: :desc)
+    def fetch_orders(filter = 'pending')
+      return unless Order.statuses.include?(filter) ? filter : 'pending'
+
+      @orders = Order.where(status: filter)
     end
 
     def order_params
