@@ -2,7 +2,7 @@
 
 module Api::Kapi::V1
   class OrdersController < Api::Kapi::V1::ApiController
-    before_action :set_order, only: %i[hard_delete]
+    before_action :set_order, only: %i[complete void hard_delete]
     before_action :authenticate_user!, except: %i[index]
 
     def index
@@ -24,11 +24,11 @@ module Api::Kapi::V1
     end
 
     def complete
-      Order.where(id: params[:id]).update!(status: :completed)
+      @order.completed!
     end
 
     def void
-      Order.where(id: params[:id]).update!(status: :voided)
+      @order.voided!
     end
 
     private
