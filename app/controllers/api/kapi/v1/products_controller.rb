@@ -32,8 +32,7 @@ module Api::Kapi::V1
                                             user_id: current_user.id)
       return unless result.failure?
 
-      render_error(status: :unprocessable_content, message: 'Error saving',
-                   errors: result.product.errors)
+      render_error(status: :unprocessable_content, message: 'Failed to update product', errors: result.errors)
     end
 
     def destroy
