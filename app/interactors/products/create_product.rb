@@ -5,7 +5,6 @@ module Products
     include Interactor
 
     delegate :product,
-             :product=,
              :product_params,
              :ingredient_create_params,
              :product_costing_params,
