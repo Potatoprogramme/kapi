@@ -2,7 +2,7 @@
 
 class Order < ApplicationRecord
   belongs_to :user
-  validates :order_total, presence: true
+  validates :order_total, :payment_method, presence: true
   has_many :order_items, dependent: :destroy
 
   enum :payment_method, { cash: 0, gcash: 1, card: 2, maya: 3 }
