@@ -40,7 +40,7 @@ module Api::Kapi::V1
     end
 
     def fetch_orders(filter = 'pending')
-      return unless Order.statuses.include?(filter) ? filter : 'pending'
+      filter = 'pending' unless Order.statuses.keys.include?(filter)
 
       @orders = Order.where(status: filter)
     end
