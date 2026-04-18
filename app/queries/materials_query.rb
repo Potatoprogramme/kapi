@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MaterialsQuery < ApplicationQuery
   Result = Struct.new(
     :records,
@@ -21,7 +23,7 @@ class MaterialsQuery < ApplicationQuery
   end
 
   def call
-    filtered_relation = apply_filters(relation.order(name: :asc))
+    filtered_relation = search(relation.order(name: :asc))
     page = page_number(filtered_relation)
     per_page = per_page_number
     total_count = filtered_relation.count
@@ -43,28 +45,11 @@ class MaterialsQuery < ApplicationQuery
 
   private
 
-  def apply_filters(scoped)
-    scoped = filter_by_category(scoped)
-    scoped = filter_by_status(scoped)
-    search(scoped)
-  end
-
-  def filter_by_category(scoped)
-    return scoped if params[:category_id].blank?
-
-    scoped.where(category_id: params[:category_id])
-  end
-
-  def filter_by_status(scoped)
-    return scoped if params[:status].blank?
-
-    scoped.where(status: params[:status])
-  end
-
   def search(scoped)
-    return scoped if params[:query].blank?
+    query = params[:query].to_s.strip
+    return scoped if query.blank?
 
-    scoped.where('name ILIKE ?', "%#{params[:query]}%")
+    scoped.where('name ILIKE ?', "%#{query}%")
   end
 
   def page_number(scoped)
