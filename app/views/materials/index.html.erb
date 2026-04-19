@@ -28,11 +28,11 @@
             placeholder: "Search materials...",
             class: "w-full pl-11 pr-4 py-3 text-sm text-amber-900 bg-white border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-medium placeholder-amber-300" %>
         </div>
-        <%# Sort dropdown %>
+        <!-- Sort Dropdown -->
         <div class="relative">
           <%= f.select :sort,
             [['Name', 'name'], ['Cost', 'cost_per_unit'], ['Unit', 'unit'], ['Newest', 'created_at']],
-            { selected: params[:sort] || 'name' },
+            { selected: @sort },
             class: "appearance-none pl-4 pr-10 py-3 text-sm text-amber-900 bg-white border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-medium" %>
           <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
             <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,17 +40,17 @@
             </svg>
           </div>
         </div>
-        <%# Direction toggle %>
-        <%= link_to materials_path(search: @search, sort: params[:sort], direction: params[:direction] == 'asc' ? 'desc' : 'asc'),
+        <!-- Direction -->
+        <%= link_to materials_path(search: @search, sort: @sort, direction: @next_direction),
           class: "flex items-center justify-center w-12 h-12 bg-white border border-amber-200 rounded-2xl hover:bg-amber-50 transition-colors" do %>
-          <svg class="w-4 h-4 text-amber-600 <%= params[:direction] == 'desc' ? 'rotate-180' : '' %> transition-transform"
+          <svg class="w-4 h-4 text-amber-600 <%= @direction == 'desc' ? 'rotate-180' : '' %> transition-transform"
             fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
           </svg>
         <% end %>
         <%= f.submit "Search",
           class: "px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-2xl text-sm cursor-pointer transition-all shadow-sm shadow-amber-200" %>
-        <%# Clear button — only show if search is active %>
+        <!-- Clear button - show only if search is present -->
         <% if @search.present? %>
           <%= link_to "Clear", materials_path,
             class: "px-5 py-3 bg-white border border-amber-200 hover:bg-amber-50 text-amber-700 font-bold rounded-2xl text-sm transition-all" %>
@@ -197,7 +197,7 @@
           of <%= @materials.total_count %>
         </p>
         <%= paginate @materials,
-  params: { search: @search, sort: params[:sort], direction: params[:direction] } %>
+        params: { search: @search, sort: @sort, direction: @direction } %>
       </div>
     <% else %>
       <!-- Compact Empty State -->
