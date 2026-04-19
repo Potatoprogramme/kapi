@@ -5,7 +5,11 @@ class ProductsController < ApplicationController
   before_action :load_form_data, only: %i[new create edit update]
   allow_unauthenticated_access only: %i[index show]
   def index
-    @products = Product.active.order(name: :asc)
+    @query = ProductsQuery.new(params)
+    @products = @query.call
+
+    # These are used by the view for the search form and pagination
+    initialize_search_options
   end
 
   def show; end
