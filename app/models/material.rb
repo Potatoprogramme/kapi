@@ -20,13 +20,14 @@ class Material < ApplicationRecord
     quantity')
   end
 
-  scope :search_by_name, ->(term) {
+  scope :search_by_name, lambda { |term|
     return all if term.blank?
+
     term = term.to_s.strip
     where('name ILIKE ?', "%#{term}%")
   }
 
-  scope :ordered_by, ->(column = 'name', direction = 'asc') {
+  scope :ordered_by, lambda { |column = 'name', direction = 'asc'|
     allowed_columns = %w[name cost_per_unit unit created_at]
     allowed_directions = ApplicationQuery::ALLOWED_DIRECTIONS
 

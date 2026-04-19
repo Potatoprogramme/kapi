@@ -12,4 +12,19 @@ class Product < ApplicationRecord
   validates :thumbnail, :name, presence: true
 
   enum :status, { deleted: 0, active: 1 }, default: :active
+
+  scope :search_by_name, lambda { |term|
+    return all if term.blank?
+
+    term = term.to_s.strip
+    where('name ILIKE ?', "%#{term}%")
+  }
+
+  scope :filter_by_category, lambda { |product_category_id, direction|
+    return all if product_category_id.blank?
+
+    safe_category_id = product_category_id.to_i
+    safe_direction = ApplicationQuery::ALLOWED_DIRECTIONS.include?(direction) ? direction : 'asc'
+    where(product_category_id: safe_category_id).order("name #{safe_direction}")
+  }
 end
