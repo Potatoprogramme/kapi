@@ -1,71 +1,44 @@
 # frozen_string_literal: true
 
 class MaterialsQuery < ApplicationQuery
-  Result = Struct.new(
-    :records,
-    :filtered_relation,
-    :page,
-    :per_page,
-    :total_count,
-    :total_pages,
-    :prev_page,
-    :next_page,
-    keyword_init: true
-  )
+  DEFAULT_PAGE = 1
+  DEFAULT_PER_PAGE = 6
 
-  DEFAULT_PER_PAGE = 9
-
-  attr_reader :relation, :params
-
-  def initialize(params, relation = Material.all)
-    @relation = relation
-    @params = params
+  def initialize(params = {})
+    super()
+    @search  = params[:search].to_s.strip
+    @page    = params[:page]    || DEFAULT_PAGE
+    @per     = params[:per]     || DEFAULT_PER_PAGE
+    @sort    = params[:sort]    || 'name'
+    @direction = params[:direction] || 'asc'
   end
 
   def call
-    filtered_relation = search(relation.order(name: :asc))
-    page = page_number(filtered_relation)
-    per_page = per_page_number
-    total_count = filtered_relation.count
-    total_pages = total_count.zero? ? 0 : (total_count.to_f / per_page).ceil
-    offset = (page - 1) * per_page
-    records = filtered_relation.offset(offset).limit(per_page)
-
-    Result.new(
-      records: records,
-      filtered_relation: filtered_relation,
-      page: page,
-      per_page: per_page,
-      total_count: total_count,
-      total_pages: total_pages,
-      prev_page: page > 1 ? page - 1 : nil,
-      next_page: page < total_pages ? page + 1 : nil
-    )
+    scope = Material.all
+    scope = apply_search(scope)
+    scope = apply_sort(scope)
+    apply_pagination(scope)
   end
 
   private
 
-  def search(scoped)
-    query = params[:query].to_s.strip
-    return scoped if query.blank?
+  def apply_search(scope)
+    return scope if @search.blank?
 
-    scoped.where('name ILIKE ?', "%#{query}%")
+    scope.where('name ILIKE :search', search: "%#{@search}%")
   end
 
-  def page_number(scoped)
-    requested_page = params[:page].to_i
-    requested_page = 1 if requested_page < 1
+  def apply_sort(scope)
+    # Whitelist allowed columns — never trust raw user input for column names
+    allowed_columns = %w[name cost_per_unit unit created_at]
 
-    total_count = scoped.count
-    total_pages = total_count.zero? ? 0 : (total_count.to_f / per_page_number).ceil
-    return 1 if total_pages.zero?
+    column    = allowed_columns.include?(@sort) ? @sort : 'name'
+    direction = ApplicationQuery::ALLOWED_DIRECTIONS.include?(@direction) ? @direction : 'asc'
 
-    [requested_page, total_pages].min
+    scope.order("#{column} #{direction}")
   end
 
-  def per_page_number
-    requested_per_page = params[:per_page].to_i
-    requested_per_page = DEFAULT_PER_PAGE if requested_per_page < 1
-    requested_per_page
+  def apply_pagination(scope)
+    scope.page(@page).per(@per)
   end
 end
