@@ -8,12 +8,7 @@ class MaterialsController < ApplicationController
     @query = MaterialsQuery.new(params)
     @materials = @query.call
 
-    # These are used by the view for the search form and pagination
-    @search = params[:search]
-    @page = params[:page]
-    @sort = params[:sort].presence || 'name'
-    @direction = params[:direction].presence || 'asc'
-    @next_direction = @direction == 'asc' ? 'desc' : 'asc'
+    initialize_search_options
   end
 
   def show; end
