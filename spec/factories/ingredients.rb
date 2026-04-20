@@ -2,7 +2,11 @@
 
 FactoryBot.define do
   factory :ingredient do
-    materials { nil }
-    product { nil }
+    association :material
+    association :product
+    association :user
+
+    quantity { 1 }
+    total_cost { 1.0 }
   end
 end

@@ -6,7 +6,6 @@ FactoryBot.define do
     association :user
 
     name { Faker::Food.dish }
-    description { 'Sample product description' }
     status { :active }
 
     after(:build) do |product|
