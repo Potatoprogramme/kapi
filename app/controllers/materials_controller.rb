@@ -9,6 +9,7 @@ class MaterialsController < ApplicationController
     @materials = @query.call
 
     initialize_search_options
+    initialize_status_cards
   end
 
   def show; end

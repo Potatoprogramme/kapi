@@ -4,7 +4,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   included do
-    helper_method :initialize_search_options
+    helper_method :initialize_search_options, :initialize_status_cards
   end
 
   private
@@ -21,5 +21,11 @@ module Searchable
 
     # For Product
     @categories = ProductCategory.all
+  end
+
+  def initialize_status_cards
+    @bean_types = Material.count
+    @total_investment = Material.sum(:cost)
+    @unit_types = Material.distinct.pluck(:unit).compact
   end
 end

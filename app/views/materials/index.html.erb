@@ -68,7 +68,7 @@
             </div>
             <div class="text-right">
               <p class="text-xs font-medium text-amber-800/70 mb-0.5">Total Bean Types</p>
-              <p class="text-2xl font-semibold text-amber-900"><%= @materials_total_count %></p>
+              <p class="text-2xl font-semibold text-amber-900"><%= @bean_types %></p>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@
             </div>
             <div class="text-right">
               <p class="text-xs font-medium text-green-800/70 mb-0.5">Total Investment</p>
-              <p class="text-2xl font-semibold text-green-900">₱<%= number_with_delimiter(@materials_total_cost, delimiter: ',') %></p>
+              <p class="text-2xl font-semibold text-green-900">₱<%= number_to_currency(@total_investment, unit: "", delimiter: ",", precision: 2) %></p>
             </div>
           </div>
         </div>
@@ -92,7 +92,7 @@
             </div>
             <div class="text-right">
               <p class="text-xs font-medium text-yellow-800/70 mb-0.5">Unit Types</p>
-              <p class="text-2xl font-semibold text-yellow-900"><%= @materials_unit_types %></p>
+              <p class="text-2xl font-semibold text-yellow-900"><%= @unit_types.count %></p>
             </div>
           </div>
         </div>
