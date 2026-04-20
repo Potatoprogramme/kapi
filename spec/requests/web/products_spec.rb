@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require_relative 'support/shared_context/web_authentication'
 
-RSpec.describe 'ProductsController', type: :request do
-  render_views
-
-  let!(:user) { create(:user) }
+RSpec.describe 'Products', type: :request do
+  include_context 'web authenticated request'
   let!(:product_category) { create(:product_category, user: user) }
   let!(:product) { create(:product, :with_ingredients, :with_costing, user: user, product_category: product_category) }
   let!(:material_one) { create(:material) }
   let!(:material_two) { create(:material) }
-  let!(:session_record) { user.sessions.create!(user_agent: 'RSpec', ip_address: '127.0.0.1') }
 
   let(:thumbnail) do
     Rack::Test::UploadedFile.new(
@@ -24,7 +22,6 @@ RSpec.describe 'ProductsController', type: :request do
       product: {
         name: 'Chocolate Velvet',
         product_category_id: product_category.id,
-        description: 'Sample product description',
         thumbnail: thumbnail,
         ingredients: {
           to_create: {
@@ -56,7 +53,6 @@ RSpec.describe 'ProductsController', type: :request do
       product: {
         name: 'Updated Chocolate Velvet',
         product_category_id: product_category.id,
-        description: 'Updated description',
         thumbnail: thumbnail,
         overhead_percentage: '20',
         profit_margin_percentage: '20',
@@ -69,13 +65,9 @@ RSpec.describe 'ProductsController', type: :request do
     }
   end
 
-  before do
-    cookies.signed[:session_id] = session_record.id
-  end
-
   describe 'GET #index' do
     it 'renders the products index' do
-      get :index
+      get products_path
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(product.name)
@@ -84,7 +76,7 @@ RSpec.describe 'ProductsController', type: :request do
 
   describe 'GET #show' do
     it 'renders the product show page' do
-      get :show, params: { id: product.id }
+      get product_path(product)
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(product.name)
@@ -93,7 +85,7 @@ RSpec.describe 'ProductsController', type: :request do
 
   describe 'GET #new' do
     it 'renders the new product form' do
-      get :new
+      get new_product_path
 
       expect(response).to have_http_status(:ok)
     end
@@ -102,7 +94,7 @@ RSpec.describe 'ProductsController', type: :request do
   describe 'POST #create' do
     it 'creates a product with ingredients and costing' do
       expect do
-        post :create, params: create_params
+        post products_path, params: create_params
       end.to change(Product, :count).by(1)
                                     .and change(Ingredient, :count).by(2)
                                                                    .and change(ProductCosting, :count).by(1)
@@ -113,7 +105,7 @@ RSpec.describe 'ProductsController', type: :request do
 
   describe 'GET #edit' do
     it 'renders the edit form' do
-      get :edit, params: { id: product.id }
+      get edit_product_path(product)
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(product.name)
@@ -122,7 +114,7 @@ RSpec.describe 'ProductsController', type: :request do
 
   describe 'PATCH #update' do
     it 'updates the product and redirects back to edit' do
-      patch :update, params: { id: product.id }.merge(update_params)
+      patch product_path(product), params: update_params.merge(id: product.id)
 
       expect(product.reload.name).to eq('Updated Chocolate Velvet')
       expect(response).to redirect_to(edit_product_path(product))
@@ -132,8 +124,10 @@ RSpec.describe 'ProductsController', type: :request do
   describe 'DELETE #destroy' do
     it 'deletes the product' do
       expect do
-        delete :destroy, params: { id: product.id }
-      end.to change(Product, :count).by(-1)
+        delete product_path(product)
+      end.not_to change(Product, :count)
+
+      expect(product.reload.status).to eq('deleted')
 
       expect(response).to redirect_to(products_path)
     end
