@@ -5,12 +5,10 @@ class MaterialsController < ApplicationController
   allow_unauthenticated_access only: %i[index show]
 
   def index
-    @query     = MaterialsQuery.new(params)
+    @query = MaterialsQuery.new(params)
     @materials = @query.call
 
-    # These are used by the view for the search form and pagination
-    @search    = params[:search]
-    @page      = params[:page]
+    initialize_search_options
   end
 
   def show; end

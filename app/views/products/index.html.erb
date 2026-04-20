@@ -28,6 +28,48 @@
         <% end %>
       </div>
     </div>
+    <%= form_with url: products_path, method: :get, local: true, class: "mb-6" do |f| %>
+      <div class="flex gap-3">
+        <div class="relative flex-1">
+          <div class="pointer-events-none absolute inset-y-0 left-4 flex items-center">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <%= f.text_field :search,
+            value: @search,
+            placeholder: "Search products...",
+            class: "w-full pl-11 pr-4 py-3 text-sm text-amber-900 bg-white border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-medium placeholder-amber-300" %>
+        </div>
+        <!--Sort Dropdown -->
+        <div class="relative">
+          <%= f.select :category,
+            options_for_select([['All Categories', '']] + @categories.pluck(:name, :id), @category),
+            {},
+            class: "appearance-none pl-4 pr-10 py-3 text-sm text-amber-900 bg-white border border-amber-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-medium" %>
+          <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Direction -->
+        <%= link_to products_path(search: @search, category: @category, direction: @next_direction),
+          class: "flex items-center justify-center w-12 h-12 bg-white border border-amber-200 rounded-2xl hover:bg-amber-50 transition-colors" do %>
+          <svg class="w-4 h-4 text-amber-600 <%= @direction == 'desc' ? 'rotate-180' : '' %> transition-transform"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
+          </svg>
+        <% end %>
+        <%= f.submit "Search",
+          class: "px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-2xl text-sm cursor-pointer transition-all shadow-sm shadow-amber-200" %>
+        <!-- Clear button - show only if search is present -->
+        <% if @search.present? %>
+          <%= link_to "Clear", products_path,
+            class: "px-5 py-3 bg-white border border-amber-200 hover:bg-amber-50 text-amber-700 font-bold rounded-2xl text-sm transition-all" %>
+        <% end %>
+      </div>
+    <% end %>
     <% if @products.any? %>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         <% roast_levels = ['Light Roast', 'Medium Roast', 'Dark Roast', 'French Roast'] %>
@@ -136,6 +178,15 @@
             </div>
           </div>
         <% end %>
+      </div>
+      <!-- Pagination -->
+      <div class="mt-6 flex items-center justify-between">
+        <p class="text-xs text-amber-500 font-medium">
+          Showing <%= @products.offset_value + 1 %>–<%= [@products.offset_value + @products.limit_value, @products.total_count].min %>
+          of <%= @products.total_count %>
+        </p>
+        <%= paginate @products,
+        params: { search: @search, category: @category, direction: @direction } %>
       </div>
     <% else %>
       <!-- Empty state -->
