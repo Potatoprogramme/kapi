@@ -70,4 +70,21 @@ RSpec.describe 'ProductCategories', type: :request do
       end
     end
   end
+
+  describe 'DELETE /destroy' do
+    it 'deletes the specified product category' do
+      category = create(:product_category)
+      expect do
+        delete product_category_path(category)
+      end.to change(ProductCategory, :count).by(-1)
+      expect(response).to redirect_to(product_categories_path)
+    end
+
+    it 'should handle deletion of non-existent product category gracefully' do
+      expect do
+        delete product_category_path(id: 'non-existent-id')
+      end.not_to change(ProductCategory, :count)
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end
