@@ -22,8 +22,11 @@ class ProductCategoriesController < ApplicationController
   end
 
   def update
-    @category.update(product_category_params)
-    redirect_to product_category_path(@category), notice: t('.success')
+    if @category.update(product_category_params)
+      redirect_to product_category_path(@category), notice: t('.success')
+    else
+      render :edit, status: :unprocessable_content
+    end
   end
 
   def destroy
