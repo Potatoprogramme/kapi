@@ -13,8 +13,7 @@ class ProductCategoriesController < ApplicationController
   def edit; end
 
   def create
-    @category = ProductCategory.new(product_category_params)
-    @category.user_id = Current.user.id
+    @category = ProductCategory.new(product_category_params.merge(user_id: Current.user.id))
     if @category.save
       redirect_to product_categories_path, notice: t('.success')
     else
