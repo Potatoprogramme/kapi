@@ -23,8 +23,8 @@ RSpec.describe 'ProductCategories', type: :request do
   end
 
   describe 'POST /create' do
-    context 'when valid params' do
-      it 'creates product category and redirects to product cateogry' do
+    context 'with valid parameters' do
+      it 'creates product category and redirects to product_categories_path' do
         new_category = build(:product_category)
         expect do
           post product_categories_path, params: { product_category: {
@@ -35,9 +35,8 @@ RSpec.describe 'ProductCategories', type: :request do
         expect(response).to redirect_to(product_categories_path)
       end
     end
-
-    context 'when invalid params' do
-      it 'does not create new product category and renders the new again' do
+    context 'with invalid paramters' do
+      it 'does not create new product category and renders new again when invalid params' do
         new_category = build(:product_category)
         expect do
           post product_categories_path, params: { product_category: {
@@ -45,6 +44,28 @@ RSpec.describe 'ProductCategories', type: :request do
             description: new_category.description
           } }
         end.not_to change(ProductCategory, :count)
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+  end
+
+  describe 'PATCH /update' do
+    context 'with valid parameters' do
+      it 'updates the product category and redirects to product_categories_path' do
+        patch product_category_path(product_category), params: {
+          product_category: { name: 'Aboslute Cinema', description: 'new test' }
+        }
+        expect(response).to redirect_to(product_category_path(product_category))
+      end
+    end
+
+    context 'with invalid parameters' do
+      it 'does not update product category and renders edit again' do
+        expect do
+          patch product_category_path(product_category), params: {
+            product_category: { name: nil, description: 'new test' }
+          }
+        end.not_to change(product_category, :name)
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
