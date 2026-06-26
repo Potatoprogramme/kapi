@@ -1,16 +1,12 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-
+require_relative 'support/shared_context/web_authentication'
 RSpec.describe 'Materials', type: :request do
   let!(:user) { create(:user) }
   let!(:material) { create(:material, user: user) }
-  let(:valid_attributes) { attributes_for(:material) }
-  let(:invalid_attributes) { attributes_for(:material, name: nil) }
 
-  before do
-    post session_path, params: { email_address: user.email_address, password: 'password' }
-  end
+  include_context 'web authenticated request'
   describe 'GET /index' do
     it 'assigns all materials to @materials and renders materials index' do
       get materials_path
@@ -30,7 +26,7 @@ RSpec.describe 'Materials', type: :request do
     context 'when valid params' do
       it 'creates material and redirects to material index' do
         expect do
-          post materials_path, params: { material: valid_attributes }
+          post materials_path, params: { material: attributes_for(:material) }
         end.to change(Material, :count).by(1)
         expect(response).to redirect_to(materials_path)
       end
@@ -39,7 +35,7 @@ RSpec.describe 'Materials', type: :request do
     context 'when invalid params' do
       it 'does not create a new material and renders the new again' do
         expect do
-          post materials_path, params: { material: invalid_attributes }
+          post materials_path, params: { material: attributes_for(:material, name: nil) }
         end.not_to change(Material, :count)
         expect(response).to have_http_status(:unprocessable_content)
       end
@@ -72,7 +68,7 @@ RSpec.describe 'Materials', type: :request do
 
     context 'when invalid params' do
       it 'does not update material and redirects back to edit form' do
-        patch material_path(material), params: { material: invalid_attributes }
+        patch material_path(material), params: { material: attributes_for(:material, name: nil) }
         expect(material.reload.name).to eq(material.name)
         expect(response).to have_http_status(:unprocessable_content)
       end

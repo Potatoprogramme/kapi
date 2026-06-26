@@ -20,3 +20,6 @@ AllCops:
 
 Style/Documentation:
   Enabled: false
+Layout/EndOfLine:
+  Enabled: false
+  EnforcedStyle: crlf

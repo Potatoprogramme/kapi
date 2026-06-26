@@ -13,8 +13,7 @@ class ProductCategoriesController < ApplicationController
   def edit; end
 
   def create
-    @category = ProductCategory.new(product_category_params)
-    @category.user_id = Current.user.id
+    @category = ProductCategory.new(product_category_params.merge(user_id: Current.user.id))
     if @category.save
       redirect_to product_categories_path, notice: t('.success')
     else
@@ -23,8 +22,11 @@ class ProductCategoriesController < ApplicationController
   end
 
   def update
-    @category.update(product_category_params)
-    redirect_to product_category_path(@category), notice: t('.success')
+    if @category.update(product_category_params)
+      redirect_to product_category_path(@category), notice: t('.success')
+    else
+      render :edit, status: :unprocessable_content
+    end
   end
 
   def destroy

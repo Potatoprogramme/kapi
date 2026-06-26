@@ -19,4 +19,21 @@ class Material < ApplicationRecord
     errors.add(:cost_per_unit, 'must equal cost divided by
     quantity')
   end
+
+  scope :search_by_name, lambda { |term|
+    return all if term.blank?
+
+    term = term.to_s.strip
+    where('name ILIKE ?', "%#{term}%")
+  }
+
+  scope :ordered_by, lambda { |column = 'name', direction = 'asc'|
+    allowed_columns = %w[name cost_per_unit unit created_at]
+    allowed_directions = ApplicationQuery::ALLOWED_DIRECTIONS
+
+    safe_column = allowed_columns.include?(column) ? column : 'name'
+    safe_direction = allowed_directions.include?(direction) ? direction : 'asc'
+
+    order("#{safe_column} #{safe_direction}")
+  }
 end

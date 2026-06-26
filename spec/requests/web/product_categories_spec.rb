@@ -1,9 +1,90 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require_relative 'support/shared_context/web_authentication'
 
 RSpec.describe 'ProductCategories', type: :request do
+  include_context 'web authenticated request'
+  let(:product_category) { create(:product_category) }
   describe 'GET /index' do
-    pending "add some examples (or delete) #{__FILE__}"
+    it 'should return a successful response' do
+      get product_categories_path
+
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe 'GET /edit' do
+    it 'assigns product and renders product form' do
+      get edit_product_category_path(product_category.id)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(product_category.name)
+    end
+  end
+
+  describe 'POST /create' do
+    context 'with valid parameters' do
+      it 'creates product category and redirects to product_categories_path' do
+        new_category = build(:product_category)
+        expect do
+          post product_categories_path, params: { product_category: {
+            name: new_category.name,
+            description: new_category.description
+          } }
+        end.to change(ProductCategory, :count).by(1)
+        expect(response).to redirect_to(product_categories_path)
+      end
+    end
+    context 'with invalid paramters' do
+      it 'does not create new product category and renders new again when invalid params' do
+        new_category = build(:product_category)
+        expect do
+          post product_categories_path, params: { product_category: {
+            name: nil,
+            description: new_category.description
+          } }
+        end.not_to change(ProductCategory, :count)
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+  end
+
+  describe 'PATCH /update' do
+    context 'with valid parameters' do
+      it 'updates the product category and redirects to product_categories_path' do
+        patch product_category_path(product_category), params: {
+          product_category: { name: 'Aboslute Cinema', description: 'new test' }
+        }
+        expect(response).to redirect_to(product_category_path(product_category))
+      end
+    end
+
+    context 'with invalid parameters' do
+      it 'does not update product category and renders edit again' do
+        expect do
+          patch product_category_path(product_category), params: {
+            product_category: { name: nil, description: 'new test' }
+          }
+        end.not_to change(product_category, :name)
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+  end
+
+  describe 'DELETE /destroy' do
+    it 'deletes the specified product category' do
+      category = create(:product_category)
+      expect do
+        delete product_category_path(category)
+      end.to change(ProductCategory, :count).by(-1)
+      expect(response).to redirect_to(product_categories_path)
+    end
+
+    it 'should handle deletion of non-existent product category gracefully' do
+      expect do
+        delete product_category_path(id: 'non-existent-id')
+      end.not_to change(ProductCategory, :count)
+      expect(response).to have_http_status(:not_found)
+    end
   end
 end

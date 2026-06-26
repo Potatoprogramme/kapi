@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :material do
+    association :user
+
     name { Faker::Food.ingredient }
     cost { Faker::Number.decimal(l_digits: 2, r_digits: 3) }
     quantity { Faker::Number.between(from: 1, to: 100) }
